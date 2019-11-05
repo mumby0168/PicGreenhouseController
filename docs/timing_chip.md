@@ -1,9 +1,9 @@
 # Timing Chip (DS1302)
 
-##Description
+##      Description
 This chip provides a capability to read and write a time and then have it tracked by the chip internally when operating a system, in this case the PIC.
 
-##Features
+## Features
 * Serial interface (read one bit at a time I/O Pin)
 * 3 pins (RST->Reset, I/O->Read/Write, SCLK->Serial Clock)
 
@@ -16,12 +16,12 @@ Source: DS1302 Trickle Charge Timekeeping Chip Datasheet
 When writing or reading this can be done on a single register or done using a burst mechnism which is supported by the timing chip.
 
 
-###Burst Mechanism
+### Burst Mechanism
 The burst which is initiated by sending the burst command will tell the chip to read all the memory location starting at (seconds) and working its way down to (year) this will send each register bit by bit.
 
 This means that the handling code will have to assemble bytes from the bits sent and when it gets a byte move on and start assembling another.
 
-###Writing Commands
+### Writing Commands
 The command byte is important to any data transfer as it must first be sent to the chip for both a read and write operation. The diagram below shows the layout of the command byte.
 
 
