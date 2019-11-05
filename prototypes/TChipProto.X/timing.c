@@ -50,6 +50,14 @@ typedef unsigned char uchar;
 typedef uchar bool;
 
 
+//Write Operations
+void WriteDate(uchar data);
+void WriteSeconds(uchar seconds);
+void WriteHours(uchar hours);
+void WriteMinutes(uchar minutes);
+
+
+//Read Operations
 void ReadSeconds();
 void ReadMinutes();
 void ReadHours();
@@ -57,18 +65,21 @@ void ReadDate();
 void ReadMonth();
 void ReadDay();
 void ReadYear();
+
+//Standard Functions
 void CompleteOperation();
-void WriteCommandByte(char);
-char AssembleByte();
+void WriteCommandByte(uchar);
+uchar AssembleByte();
+void WriteByte(uchar*);
 
 typedef struct
 {
-    char seconds;
-    char minutes;
-    char hours;
-    char date;
-    char day;
-    char month;
+    uchar seconds;
+    uchar minutes;
+    uchar hours;
+    uchar date;
+    uchar day;
+    uchar month;
     ushort year;
 } Clock;
 
@@ -89,8 +100,13 @@ inline bool IsBitSet(uchar* byValue, uchar byBitOffset)
     return (*byValue >> byBitOffset) & 1U;
 }
 
+inline void SetBitHigh(uchar* byValue, uchar byBitOffset)
+{
+    *byValue |= (1U << byBitOffset);
+}
 
-inline void WriteCommandByte(char byte)
+
+inline void WriteCommandByte(uchar byte)
 {    
     RST = 1; // Drive RST High
     
@@ -101,9 +117,17 @@ inline void WriteCommandByte(char byte)
     }
 }
 
-inline char AssembleByte()
+void WriteByte(uchar *byte)
 {
-    char ret = 0;
+    for(int i = 0; i < 8; i++)
+    {
+        IO = (*byte << i);
+    }
+}
+
+inline uchar AssembleByte()
+{
+    uchar ret = 0;
     for(int i = 8; i > 0; i--)
     {
         ret |= (IO << i);
@@ -115,6 +139,7 @@ inline void memset(char* const ptr, const unsigned char c, const unsigned int le
     for (char* p = ptr; p < p + len; p++)
         *p = c;
 }
+
 #define ZERO_MEMORY(ptr, type) memset(ptr, 0, sizeof(type))
 
 void main(void) {
@@ -125,8 +150,40 @@ void main(void) {
 
 void Init()
 {
-    ZERO_MEMORY(&g_clock, Clock);      
+    // ZERO_MEMORY(&g_clock, Clock);      
 }
+
+void WriteSeconds(uchar seconds)
+{
+    uchar encoded = 0;
+    uchar tens = seconds / 10;
+    uchar digits = seconds % 10;
+    encoded = digits;
+    encoded |= (tens << 4);
+    WriteByte(&encoded);
+}
+
+void WriteMinutes(uchar minutes)
+{
+    uchar encoded = 0;
+    uchar tens = minutes / 10;
+    uchar digits = minutes % 10;
+    encoded = digits;
+    encoded |= (tens << 4);
+    WriteByte(&encoded);
+}
+
+void WriteHours(uchar hours)
+{
+    char encoded = 0;
+    if(hours > 12) SetBitHigh(&encoded, 7);
+    uchar tens = hours / 10;
+    uchar digits = hours % 10;
+    encoded = digits;
+    encoded |= (tens << 3);
+    WriteByte(&encoded);
+}
+
 
 void BurstRead()
 {
@@ -141,30 +198,29 @@ void BurstRead()
     CompleteOperation();
 }
 
-
 void ReadSeconds()
 {    
-    char temp = AssembleByte();
-    char tens = (temp & 0x70);
-    char digits = (temp & 0x07);    
+    uchar temp = AssembleByte();
+    uchar tens = (temp & 0x70);
+    uchar digits = (temp & 0x07);    
     g_clock.seconds = (tens * 10) + digits;
 }
 
 void ReadMinutes()
 {    
-    char temp = AssembleByte();    
-    char tens = (temp & 0x70);
-    char digits = (temp & 0x07);    
+    uchar temp = AssembleByte();    
+    uchar tens = (temp & 0x70);
+    uchar digits = (temp & 0x07);    
     g_clock.minutes = (tens * 10) + digits;
 }
 
 void ReadHours()
 {
     //TODO: double check assumptions made here based of bit defitions from the datasheet.   
-    char temp = AssembleByte();    
-    char digits = (temp & 0x0F);
+    uchar temp = AssembleByte();    
+    uchar digits = (temp & 0x0F);
     //assume 1 means 24 hr clock i.e. after 12am.
-    char tens = 0;
+    uchar tens = 0;
     if(IsBitSet(&temp, 7))
     {
         tens = (temp & 0x30);
@@ -178,31 +234,31 @@ void ReadHours()
 
 void ReadDate()
 {
-    char temp = AssembleByte();
-    char tens = (temp & 0x30);
-    char digits = (temp & 0x0F);
+    uchar temp = AssembleByte();
+    uchar tens = (temp & 0x30);
+    uchar digits = (temp & 0x0F);
     g_clock.date = (tens * 10) + digits;    
 }
 
 void ReadMonth()
 {    
-    char temp = AssembleByte();  
-    char digits = (temp & 0x0F);
-    char tens = (temp & 0x10);
+    uchar temp = AssembleByte();  
+    uchar digits = (temp & 0x0F);
+    uchar tens = (temp & 0x10);
     g_clock.month = (tens * 10) + digits;
 }
 
 void ReadDay()
 {    
-    char temp = AssembleByte();
+    uchar temp = AssembleByte();
     g_clock.day = (temp & 0x07);
 }
 
 void ReadYear()
 {
-    char temp = AssembleByte(); 
-    char tens = (temp & 0xF0);
-    char digits = (temp & 0x0F);
+    uchar temp = AssembleByte(); 
+    uchar tens = (temp & 0xF0);
+    uchar digits = (temp & 0x0F);
     g_clock.year = (tens * 10) + digits;
 }
 
