@@ -19,4 +19,5 @@
 **/funclist
 **/nbproject/Makefile-*
 **/disassembly/
+**/.vscode
 *.map
