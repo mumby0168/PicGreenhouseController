@@ -20,6 +20,7 @@
 
 #define RST RB5
 #define IO RB4
+#define SCLK RB0
 
 //begin command defs
 #define WRITE_BURST 0xBE
@@ -111,36 +112,67 @@ inline void SetBitHigh(uchar* byValue, uchar byBitOffset)
 
 inline void WriteCommandByte(uchar byte)
 {    
+    TRISB0 = 0;
+    SCLK = 0;
     RST = 1; // Drive RST High
+    TRISB0 = 1;
     
     //write the 8 bits of the command byte.
     for(int i = 0; i < 8; i++)
     {
-        IO = (byte << i);
+        IO = (byte >> i) | 1 ? 1 : 0;
     }
 }
 
 void WriteByte(uchar *byte)
 {
-    for(int i = 0; i < 8; i++)
+    char counter = 0;
+    while(counter < 8)
     {
-        IO = (*byte << i) == 1 ? 1 : 0;
-    }
+        if(SCLK == 1)
+        {
+            IO = (*byte >> counter) | 1 ? 1 : 0;
+            counter++;
+        }
+
+        while(SCLK == 1);
+    }    
 }
 
 inline uchar AssembleByte()
 {
     uchar ret = 0;
-    for(int i = 8; i > 0; i--)
+
+    char counter = 0;
+
+    while (counter < 8)
     {
-        ret |= (IO << i);
-    }    
+        if(SCLK == 0)
+        {
+            ret |= (IO << counter);
+            counter++;
+        }
+
+        while (SCLK == 0);        
+    }        
     return ret;
 }
 
-inline void memset(char* const ptr, const unsigned char c, const unsigned int len)
+void Timing_PrepareWrite()
 {
-    for (char* p = ptr; p < p + len; p++)
+    TRISB4 = 0;
+    TRISB5 = 0;        
+}
+
+void Timing_PrepareRead()
+{
+    TRISB4 = 1;
+    TRISB5 = 0;    
+}
+
+inline void memset(void* const ptr, const unsigned char c, const unsigned int len)
+{
+    for (char* p = (char*)ptr; p < p + len; p++)
         *p = c;
 }
 
@@ -150,23 +182,26 @@ void main(void) {
     
     Init();
     Initialise();
-    SetDisplayMode(true, true, true);  
+    
     ClearDisplay();
     SetDisplayResolution(true, false);    
-
-    WriteHours(10);
-    WriteMinutes(20);
-    WriteSeconds(20);
+    
+    Timing_PrepareWrite();
+    WriteCommandByte(WRITE_SECONDS);    
+    WriteHours(0);
+    CompleteOperation();    
+    
 
     while (true)
     {
-        ReadHours();
-        ReadMinutes();
+        Timing_PrepareWrite();
+        WriteCommandByte(READ_SECONDS);        
+        Timing_PrepareRead();
         ReadSeconds();
-
-        WriteCharacter(g_clock.hours);
-        WriteCharacter(g_clock.minutes);
-        WriteCharacter(g_clock.seconds);        
+        CompleteOperation();        
+        WriteNumber(g_clock.hours);        
+        ClearDisplay();
+        SetDisplayMode(true, false, false);      
     }
     
 
@@ -174,6 +209,7 @@ void main(void) {
 
 void Init()
 {
+    TRISB = 1;
     ZERO_MEMORY(&g_clock, Clock);      
 }
 

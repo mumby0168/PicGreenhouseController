@@ -2,10 +2,6 @@
 #define LCD_H
 
 #include <xc.h>
-
-#define RS RA1
-#define RW RA2
-#define Enable RA3
 #define true 1
 #define false 0
 
@@ -31,6 +27,7 @@ void SetDdramAddress(uchar addr);
 void SetCursorPosition(bool secondLine, uchar pos);
 
 void WriteCharacter(char c);
+void WriteNumber(char num);
 void Initialise();   
 
 #endif

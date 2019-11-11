@@ -1,5 +1,9 @@
 #include "lcd.h"
 
+#define RS RA1
+#define RW RA2
+#define Enable RA3
+
 inline void WriteCommand(uchar cmd)
 {
     TRISD = 0x00;
@@ -70,6 +74,17 @@ void WriteCharacter(char c)
     Enable = 0;
     delay();
     Enable = 1;
+}
+
+void WriteNumber(char num)
+{
+    if(num > 10)
+    {
+        char tens = num / 10;
+        WriteCharacter(tens + 48);
+    }
+    char digits = num & 10;
+    WriteCharacter(digits + 10);
 }
 
 void Initialise()
