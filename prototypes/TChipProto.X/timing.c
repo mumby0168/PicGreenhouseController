@@ -5,6 +5,7 @@
  * Created on 04 November 2019, 13:40
  */
 #include <xc.h> 
+#include "lcd.h"
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
 #pragma config WDTE = OFF//Watchdog Timer Enable bit (WDT enabled)
@@ -46,8 +47,6 @@
 // end command defs
 
 typedef unsigned short int ushort;
-typedef unsigned char uchar;
-typedef uchar bool;
 
 
 //Write Operations
@@ -132,6 +131,7 @@ inline uchar AssembleByte()
     {
         ret |= (IO << i);
     }    
+    return ret;
 }
 
 inline void memset(char* const ptr, const unsigned char c, const unsigned int len)
@@ -175,7 +175,7 @@ void WriteMinutes(uchar minutes)
 
 void WriteHours(uchar hours)
 {
-    char encoded = 0;
+    uchar encoded = 0;
     if(hours > 12) SetBitHigh(&encoded, 7);
     uchar tens = hours / 10;
     uchar digits = hours % 10;
