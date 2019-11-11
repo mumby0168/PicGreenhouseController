@@ -11,18 +11,21 @@ inline void WriteCommand(uchar cmd)
     Enable = 1;
     PORTD = 0;
 }
-inline void SetDisplayMode(bool displayOn, bool cursorOn, bool cursorBlink)
+
+void delay() { int i;for(i=0;i<5000;i++); }
+
+void SetDisplayMode(bool displayOn, bool cursorOn, bool cursorBlink)
 {
     WriteCommand(0b00001000 | displayOn << 2 | cursorOn << 1 | cursorBlink);  
 }
 
 //If display two lines is true, display large font will be ignored
-inline void SetDisplayResolution(bool displayTwoLines, bool displayLargeFont)
+void SetDisplayResolution(bool displayTwoLines, bool displayLargeFont)
 {
     WriteCommand(0b00110000 | displayTwoLines << 3 | displayLargeFont << 2);
 }
 
-inline void ClearDisplay()
+void ClearDisplay()
 {
     WriteCommand(0x1);
 }
@@ -37,7 +40,7 @@ void ShiftDisplay(bool right)
     WriteCommand(0b00011000 | right << 2);
 }
 
-inline void MoveCursorToStart()
+void MoveCursorToStart()
 {
     WriteCommand(0x02);
 }
@@ -47,7 +50,7 @@ void SetDdramAddress(uchar addr)
     WriteCommand(0b10000000 | addr);
 }
 
-inline void SetCursorPosition(bool secondLine, uchar pos)
+void SetCursorPosition(bool secondLine, uchar pos)
 {
     MoveCursorToStart();
     if (pos > 39)
@@ -59,7 +62,7 @@ inline void SetCursorPosition(bool secondLine, uchar pos)
     SetDdramAddress(pos);
 }
 
-inline void WriteCharacter(char c)
+void WriteCharacter(char c)
 {
     RS = 1;
     RW = 0;
@@ -69,8 +72,7 @@ inline void WriteCharacter(char c)
     Enable = 1;
 }
 
-
-inline void Initialise()
+void Initialise()
 {
     // 1: input 0: output
     ADCON1 = 0x07;

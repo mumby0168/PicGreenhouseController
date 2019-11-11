@@ -4,8 +4,10 @@
  *
  * Created on 04 November 2019, 13:40
  */
-#include <xc.h> 
+
 #include "lcd.h"
+#include <xc.h> 
+
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
 #pragma config WDTE = OFF//Watchdog Timer Enable bit (WDT enabled)
@@ -71,6 +73,8 @@ void WriteCommandByte(uchar);
 uchar AssembleByte();
 void WriteByte(uchar*);
 
+void Init();
+
 typedef struct
 {
     uchar seconds;
@@ -120,7 +124,7 @@ void WriteByte(uchar *byte)
 {
     for(int i = 0; i < 8; i++)
     {
-        IO = (*byte << i);
+        IO = (*byte << i) == 1 ? 1 : 0;
     }
 }
 
@@ -143,14 +147,34 @@ inline void memset(char* const ptr, const unsigned char c, const unsigned int le
 #define ZERO_MEMORY(ptr, type) memset(ptr, 0, sizeof(type))
 
 void main(void) {
-    TRISC =  0x00;
-    PORTC = 0x55; 
-    for (;;);
+    
+    Init();
+    Initialise();
+    SetDisplayMode(true, true, true);  
+    ClearDisplay();
+    SetDisplayResolution(true, false);    
+
+    WriteHours(10);
+    WriteMinutes(20);
+    WriteSeconds(20);
+
+    while (true)
+    {
+        ReadHours();
+        ReadMinutes();
+        ReadSeconds();
+
+        WriteCharacter(g_clock.hours);
+        WriteCharacter(g_clock.minutes);
+        WriteCharacter(g_clock.seconds);        
+    }
+    
+
 }
 
 void Init()
 {
-    // ZERO_MEMORY(&g_clock, Clock);      
+    ZERO_MEMORY(&g_clock, Clock);      
 }
 
 void WriteSeconds(uchar seconds)

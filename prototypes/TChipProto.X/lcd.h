@@ -2,30 +2,36 @@
 #define LCD_H
 
 #include <xc.h>
+
+#define RS RA1
+#define RW RA2
+#define Enable RA3
+#define true 1
+#define false 0
+
 typedef unsigned char uchar;
 typedef uchar bool;
 
-void delay() { int i;for(i=0;i<5000;i++); }
+void delay();
 
-inline void SetDisplayMode(bool displayOn, bool cursorOn, bool cursorBlink);
+void SetDisplayMode(bool displayOn, bool cursorOn, bool cursorBlink);
 
-inline void SetDisplayResolution(bool displayTwoLines, bool displayLargeFont);
+void SetDisplayResolution(bool displayTwoLines, bool displayLargeFont);
 
-inline void ClearDisplay();
+void ClearDisplay();
 
 void ShiftCursor(bool right);
 
 void ShiftDisplay(bool right);
 
-inline void MoveCursorToStart();
+void MoveCursorToStart();
 
 void SetDdramAddress(uchar addr);
 
-inline void SetCursorPosition(bool secondLine, uchar pos);
+void SetCursorPosition(bool secondLine, uchar pos);
 
-inline void WriteCharacter(char c);
-
-inline void Initialise();   
+void WriteCharacter(char c);
+void Initialise();   
 
 #endif
 
