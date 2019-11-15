@@ -78,11 +78,6 @@ void WriteCharacter(char c)
 
 void WriteNumber(char num)
 {
-    if(num > 100)
-    {
-        WriteCharacter(126);
-        return;
-    }
     if(num > 10)
     {
         char tens = num / 10;

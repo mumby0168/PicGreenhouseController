@@ -24,6 +24,7 @@
 
 #define SCKL_CONFIG TRISB0
 #define IO_CONFIG TRISB4
+#define RST_CONFIG TRISB5
 
 //begin command defs
 #define WRITE_BURST 0xBE
@@ -139,32 +140,34 @@ inline void WriteCommandByte(uchar byte)
 }
 
 void WriteByte(uchar *byte)
-{
-    SCLK = 0; //ensure clock is low.
-
+{    
+    IO_CONFIG = 0;
     char counter = 0;
     while(counter < 8)
     {
-        SCLK = 1; // Ensure pull up before placing bit.
+        SCLK = 0; // Ensure pull up before placing bit.
         IO = (*byte >> counter) | 1 ? 1 : 0;        
-        SCLK = 0; // Ensure pull down after writing bit.
+        SCLK = 1; // Ensure pull down after writing bit.
         counter++;
     }    
 }
 
 inline uchar AssembleByte()
 {
+    IO_CONFIG = 1;
     uchar ret = 0;
 
     char counter = 0;
-
-    SCLK = 1; // ensure clock is high at start.
+    uchar temp = 0;
 
     while (counter < 8)
     {        
         SCLK = 0; // drive low to read bit.
-        ret |= (IO << counter);        
+        // NOP();
+        temp = (IO == 1) ? 1 : 0;
+        // NOP();
         SCLK = 1; // drive back high
+        ret |= (temp << counter);                
         counter++;   
     }        
     return ret;
@@ -192,6 +195,7 @@ void WriteTimeToLcd()
     WriteCharacter(58); // :
 
     WriteNumber(g_rawClock.secondsTens);
+    WriteCharacter(58); // :
     WriteNumber(g_rawClock.secondDigits);
 }
 
@@ -203,17 +207,16 @@ void main(void) {
     ClearDisplay();
     SetDisplayResolution(true, false);        
     
-    SetTime(0, 0, 0);
+ //   SetTime(10, 10, 10);
 
     while (true)
-    {
-        ReadTime();        
-        WriteTimeToLcd();
-        SetDisplayMode(true, false, false);
+    {        
         ClearDisplay();
-    }
-    
-
+        SetDisplayMode(false, false, false);    
+        ReadTime();    
+        // WriteTimeToLcd();      
+        SetDisplayMode(true, false, false);        
+    }  
 }
 
 void Init()
@@ -225,6 +228,7 @@ void Init()
     //set clock as output & send 0.
     SCKL_CONFIG = 0;
     SCLK = 0;
+    RST_CONFIG = 0;
 
     //enables the clock.
     RST = 0;
@@ -242,27 +246,27 @@ void Init()
 void SetTime(uchar hours, uchar minutes, uchar seconds)
 {
     WriteCommandByte(WRITE_HOURS);
-    WriteByte(&hours);
+    WriteHours(hours);
     COMPLETE_OPERATION
 
     WriteCommandByte(WRITE_MINUTES);
-    WriteByte(&minutes);
+    WriteMinutes(minutes);
     COMPLETE_OPERATION
 
     WriteCommandByte(WRITE_SECONDS);
-    WriteByte(&seconds);
+    WriteSeconds(seconds);
     COMPLETE_OPERATION
 }
 
 void ReadTime()
 {
-    WriteCommandByte(READ_HOURS);
-    ReadHours();
-    COMPLETE_OPERATION
+    // WriteCommandByte(READ_HOURS);
+    // ReadHours();
+    // COMPLETE_OPERATION
 
-    WriteCommandByte(READ_MINUTES);
-    ReadMinutes();
-    COMPLETE_OPERATION    
+    // WriteCommandByte(READ_MINUTES);
+    // ReadMinutes();
+    // COMPLETE_OPERATION    
 
     WriteCommandByte(READ_SECONDS);
     ReadSeconds();
@@ -318,9 +322,9 @@ void ReadSeconds()
 {    
     uchar temp = AssembleByte();
     uchar tens = (temp & 0x70);
-    uchar digits = (temp & 0x07);    
+    uchar digits = (temp & 0x0F);        
     g_rawClock.secondDigits = digits;
-    g_rawClock.secondsTens = tens;
+    g_rawClock.secondsTens = tens % 10;
     g_clock.seconds = (tens * 10) + digits;
 }
 
@@ -328,9 +332,9 @@ void ReadMinutes()
 {    
     uchar temp = AssembleByte();    
     uchar tens = (temp & 0x70);
-    uchar digits = (temp & 0x07);    
+    uchar digits = (temp & 0x0F);    
     g_rawClock.minutesDigits = digits;
-    g_rawClock.minutesTens = tens;
+    g_rawClock.minutesTens = tens % 10;
     g_clock.minutes = (tens * 10) + digits;
 }
 
@@ -351,7 +355,7 @@ void ReadHours()
     }        
 
     g_rawClock.hoursDigits = digits;
-    g_rawClock.hoursTens = tens;
+    g_rawClock.hoursTens = tens % 10;
     g_clock.minutes = (tens * 10) + digits;
 }
 
