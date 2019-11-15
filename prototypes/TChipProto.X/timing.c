@@ -22,6 +22,9 @@
 #define IO RB4
 #define SCLK RB0
 
+#define SCKL_CONFIG TRISB0
+#define IO_CONFIG TRISB4
+
 //begin command defs
 #define WRITE_BURST 0xBE
 #define READ_BURST 0xBF
@@ -46,6 +49,9 @@
 
 #define WRITE_YEAR 0x8C
 #define READ_YEAR 0x8D
+
+#define CONTROL_CMD 0x8E
+
 
 // end command defs
 
@@ -74,6 +80,10 @@ void WriteCommandByte(uchar);
 uchar AssembleByte();
 void WriteByte(uchar*);
 
+//Higher level Lib
+void SetTime(uchar hours, uchar minutes, uchar seconds);
+void ReadTime();
+
 void Init();
 
 typedef struct
@@ -87,17 +97,26 @@ typedef struct
     ushort year;
 } Clock;
 
+typedef struct 
+{
+    uchar secondsTens;
+    uchar secondDigits;
+
+    uchar minutesTens;
+    uchar minutesDigits;
+    
+    uchar hoursTens;
+    uchar hoursDigits;
+
+} RawClock;
+
 
 Clock g_clock;
+RawClock g_rawClock;
 
 /* to timing .h file end*/
 
-
-//This MUST be called prior to every operation makes sense to do this externally for now.
-inline void CompleteOperation()
-{
-    RST = 0;
-}
+#define COMPLETE_OPERATION RST = 0;
 
 inline bool IsBitSet(uchar* byValue, uchar byBitOffset)
 {
@@ -112,30 +131,24 @@ inline void SetBitHigh(uchar* byValue, uchar byBitOffset)
 
 inline void WriteCommandByte(uchar byte)
 {    
-    TRISB0 = 0;
-    SCLK = 0;
-    RST = 1; // Drive RST High
-    TRISB0 = 1;
-    
+    //set io pin to output
+    IO_CONFIG = 0;    
+    RST = 1; // Drive RST High        
     //write the 8 bits of the command byte.
-    for(int i = 0; i < 8; i++)
-    {
-        IO = (byte >> i) | 1 ? 1 : 0;
-    }
+    WriteByte(&byte);
 }
 
 void WriteByte(uchar *byte)
 {
+    SCLK = 0; //ensure clock is low.
+
     char counter = 0;
     while(counter < 8)
     {
-        if(SCLK == 1)
-        {
-            IO = (*byte >> counter) | 1 ? 1 : 0;
-            counter++;
-        }
-
-        while(SCLK == 1);
+        SCLK = 1; // Ensure pull up before placing bit.
+        IO = (*byte >> counter) | 1 ? 1 : 0;        
+        SCLK = 0; // Ensure pull down after writing bit.
+        counter++;
     }    
 }
 
@@ -145,30 +158,18 @@ inline uchar AssembleByte()
 
     char counter = 0;
 
-    while (counter < 8)
-    {
-        if(SCLK == 0)
-        {
-            ret |= (IO << counter);
-            counter++;
-        }
+    SCLK = 1; // ensure clock is high at start.
 
-        while (SCLK == 0);        
+    while (counter < 8)
+    {        
+        SCLK = 0; // drive low to read bit.
+        ret |= (IO << counter);        
+        SCLK = 1; // drive back high
+        counter++;   
     }        
     return ret;
 }
 
-void Timing_PrepareWrite()
-{
-    TRISB4 = 0;
-    TRISB5 = 0;        
-}
-
-void Timing_PrepareRead()
-{
-    TRISB4 = 1;
-    TRISB5 = 0;    
-}
 
 inline void memset(void* const ptr, const unsigned char c, const unsigned int len)
 {
@@ -178,30 +179,38 @@ inline void memset(void* const ptr, const unsigned char c, const unsigned int le
 
 #define ZERO_MEMORY(ptr, type) memset(ptr, 0, sizeof(type))
 
+void WriteTimeToLcd()
+{
+    WriteNumber(g_rawClock.hoursTens);
+    WriteNumber(g_rawClock.hoursDigits);    
+
+    WriteCharacter(58); // :
+
+    WriteNumber(g_rawClock.minutesTens);
+    WriteNumber(g_rawClock.minutesDigits);
+
+    WriteCharacter(58); // :
+
+    WriteNumber(g_rawClock.secondsTens);
+    WriteNumber(g_rawClock.secondDigits);
+}
+
 void main(void) {
     
     Init();
     Initialise();
     
     ClearDisplay();
-    SetDisplayResolution(true, false);    
+    SetDisplayResolution(true, false);        
     
-    Timing_PrepareWrite();
-    WriteCommandByte(WRITE_SECONDS);    
-    WriteHours(0);
-    CompleteOperation();    
-    
+    SetTime(0, 0, 0);
 
     while (true)
     {
-        Timing_PrepareWrite();
-        WriteCommandByte(READ_SECONDS);        
-        Timing_PrepareRead();
-        ReadSeconds();
-        CompleteOperation();        
-        WriteNumber(g_clock.hours);        
+        ReadTime();        
+        WriteTimeToLcd();
+        SetDisplayMode(true, false, false);
         ClearDisplay();
-        SetDisplayMode(true, false, false);      
     }
     
 
@@ -209,8 +218,55 @@ void main(void) {
 
 void Init()
 {
-    TRISB = 1;
-    ZERO_MEMORY(&g_clock, Clock);      
+    //Init structs    
+    ZERO_MEMORY(&g_clock, Clock);     
+    ZERO_MEMORY(&g_rawClock, RawClock);    
+
+    //set clock as output & send 0.
+    SCKL_CONFIG = 0;
+    SCLK = 0;
+
+    //enables the clock.
+    RST = 0;
+    RST = 1;
+    // IO as output
+    IO_CONFIG = 0;
+    // speak to sir to find out where docs are for these operations
+    WriteCommandByte(CONTROL_CMD);
+    WriteByte(0); 
+
+    COMPLETE_OPERATION // Drives reset low.
+}
+
+
+void SetTime(uchar hours, uchar minutes, uchar seconds)
+{
+    WriteCommandByte(WRITE_HOURS);
+    WriteByte(&hours);
+    COMPLETE_OPERATION
+
+    WriteCommandByte(WRITE_MINUTES);
+    WriteByte(&minutes);
+    COMPLETE_OPERATION
+
+    WriteCommandByte(WRITE_SECONDS);
+    WriteByte(&seconds);
+    COMPLETE_OPERATION
+}
+
+void ReadTime()
+{
+    WriteCommandByte(READ_HOURS);
+    ReadHours();
+    COMPLETE_OPERATION
+
+    WriteCommandByte(READ_MINUTES);
+    ReadMinutes();
+    COMPLETE_OPERATION    
+
+    WriteCommandByte(READ_SECONDS);
+    ReadSeconds();
+    COMPLETE_OPERATION
 }
 
 void WriteSeconds(uchar seconds)
@@ -263,6 +319,8 @@ void ReadSeconds()
     uchar temp = AssembleByte();
     uchar tens = (temp & 0x70);
     uchar digits = (temp & 0x07);    
+    g_rawClock.secondDigits = digits;
+    g_rawClock.secondsTens = tens;
     g_clock.seconds = (tens * 10) + digits;
 }
 
@@ -271,6 +329,8 @@ void ReadMinutes()
     uchar temp = AssembleByte();    
     uchar tens = (temp & 0x70);
     uchar digits = (temp & 0x07);    
+    g_rawClock.minutesDigits = digits;
+    g_rawClock.minutesTens = tens;
     g_clock.minutes = (tens * 10) + digits;
 }
 
@@ -289,6 +349,9 @@ void ReadHours()
     {
         tens = IsBitSet(&temp, 4) ? 1 : 0;
     }        
+
+    g_rawClock.hoursDigits = digits;
+    g_rawClock.hoursTens = tens;
     g_clock.minutes = (tens * 10) + digits;
 }
 

@@ -83,8 +83,8 @@ void WriteNumber(char num)
         char tens = num / 10;
         WriteCharacter(tens + 48);
     }
-    char digits = num & 10;
-    WriteCharacter(digits + 10);
+    char digits = num % 10;
+    WriteCharacter(digits + 48);
 }
 
 void Initialise()
