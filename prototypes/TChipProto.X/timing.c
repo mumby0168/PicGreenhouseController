@@ -142,35 +142,32 @@ inline void WriteCommandByte(uchar byte)
 void WriteByte(uchar *byte)
 {    
     IO_CONFIG = 0;
-    char counter = 0;
-    while(counter < 8)
-    {
+    char i;
+     for (i = 0; i < 8; i++)
+    {          
         SCLK = 0; // Ensure pull up before placing bit.
-        IO = (*byte >> counter) | 1 ? 1 : 0;        
-        SCLK = 1; // Ensure pull down after writing bit.
-        counter++;
-    }    
+        IO = (*byte >> i) & 1;        
+        SCLK = 1; // Ensure pull down after writing bit.        
+    } 
+    SCLK = 0;
 }
 
 inline uchar AssembleByte()
 {
     IO_CONFIG = 1;
-    uchar ret = 0;
-
-    char counter = 0;
+    uchar ret = 0;    
     uchar temp = 0;
-
-    while (counter < 8)
+    int i;
+    for (i = 0; i < 8; i++)
     {        
-        SCLK = 0; // drive low to read bit.
-        // NOP();
-        temp = (IO == 1) ? 1 : 0;
-        // NOP();
+        temp = 0;
+        SCLK = 0; // drive low to read bit.        
+        temp = IO & 1;        
         SCLK = 1; // drive back high
-        ret |= (temp << counter);                
-        counter++;   
-    }        
-    return ret;
+        ret |= (temp << i);          
+    }           
+    SCLK = 0;
+    return(ret);
 }
 
 
@@ -194,8 +191,7 @@ void WriteTimeToLcd()
 
     WriteCharacter(58); // :
 
-    WriteNumber(g_rawClock.secondsTens);
-    WriteCharacter(58); // :
+    WriteNumber(g_rawClock.secondsTens);    
     WriteNumber(g_rawClock.secondDigits);
 }
 
@@ -207,14 +203,13 @@ void main(void) {
     ClearDisplay();
     SetDisplayResolution(true, false);        
     
- //   SetTime(10, 10, 10);
+    SetTime(10, 10, 10);
 
     while (true)
     {        
-        ClearDisplay();
-        SetDisplayMode(false, false, false);    
+        ClearDisplay();          
         ReadTime();    
-        // WriteTimeToLcd();      
+        WriteTimeToLcd();
         SetDisplayMode(true, false, false);        
     }  
 }
@@ -260,13 +255,13 @@ void SetTime(uchar hours, uchar minutes, uchar seconds)
 
 void ReadTime()
 {
-    // WriteCommandByte(READ_HOURS);
-    // ReadHours();
-    // COMPLETE_OPERATION
+    WriteCommandByte(READ_HOURS);
+    ReadHours();
+    COMPLETE_OPERATION
 
-    // WriteCommandByte(READ_MINUTES);
-    // ReadMinutes();
-    // COMPLETE_OPERATION    
+    WriteCommandByte(READ_MINUTES);
+    ReadMinutes();
+    COMPLETE_OPERATION    
 
     WriteCommandByte(READ_SECONDS);
     ReadSeconds();
