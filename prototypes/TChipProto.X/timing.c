@@ -203,7 +203,7 @@ void main(void) {
     ClearDisplay();
     SetDisplayResolution(true, false);        
     
-    SetTime(10, 10, 10);
+    SetTime(12, 59, 45);
 
     while (true)
     {        
@@ -291,11 +291,20 @@ void WriteMinutes(uchar minutes)
 void WriteHours(uchar hours)
 {
     uchar encoded = 0;
-    if(hours > 12) SetBitHigh(&encoded, 7);
-    uchar tens = hours / 10;
-    uchar digits = hours % 10;
-    encoded = digits;
-    encoded |= (tens << 3);
+    uchar tens = hours / 10;    
+    
+    uchar digits = hours % 10;    
+    encoded = digits;    
+    if(hours > 12) 
+    {
+        SetBitHigh(&encoded, 7);        
+    }
+        
+    if(hours > 9)
+    {
+        SetBitHigh(&encoded, 4);  
+    }
+    
     WriteByte(&encoded);
 }
 
@@ -316,20 +325,20 @@ void BurstRead()
 void ReadSeconds()
 {    
     uchar temp = AssembleByte();
-    uchar tens = (temp & 0x70);
+    uchar tens = (temp & 0x70) >> 4;    
     uchar digits = (temp & 0x0F);        
     g_rawClock.secondDigits = digits;
-    g_rawClock.secondsTens = tens % 10;
+    g_rawClock.secondsTens = tens;
     g_clock.seconds = (tens * 10) + digits;
 }
 
 void ReadMinutes()
 {    
     uchar temp = AssembleByte();    
-    uchar tens = (temp & 0x70);
+    uchar tens = (temp & 0x70) >> 4;
     uchar digits = (temp & 0x0F);    
     g_rawClock.minutesDigits = digits;
-    g_rawClock.minutesTens = tens % 10;
+    g_rawClock.minutesTens = tens;
     g_clock.minutes = (tens * 10) + digits;
 }
 
@@ -340,17 +349,16 @@ void ReadHours()
     uchar digits = (temp & 0x0F);
     //assume 1 means 24 hr clock i.e. after 12am.
     uchar tens = 0;
+
+    tens = IsBitSet(&temp, 4);
+
     if(IsBitSet(&temp, 7))
     {
-        tens = (temp & 0x30);
-    }
-    else
-    {
-        tens = IsBitSet(&temp, 4) ? 1 : 0;
-    }        
+        tens++;
+    }    
 
     g_rawClock.hoursDigits = digits;
-    g_rawClock.hoursTens = tens % 10;
+    g_rawClock.hoursTens = tens;
     g_clock.minutes = (tens * 10) + digits;
 }
 
