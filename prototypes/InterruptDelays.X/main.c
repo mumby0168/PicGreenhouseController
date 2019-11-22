@@ -11,6 +11,15 @@
 #pragma config LVP = OFF // Low-Voltage (Single-Supply) In-Circuit SerialProgramming Enable bit (RB3 is digital I/O, HV on MCLR must be used for programming)
 //end config
 
+const char* Byte_ToString(const char byValue)
+{
+    char hundreds = byValue / 100;
+    char tens = (byValue % 100) / 10;
+    char units = (byValue % 100) % 10;
+    
+    return "a";
+}
+
 void main(void) {
     ADCON1 = 0x07;
     TRISB = 0x00;
