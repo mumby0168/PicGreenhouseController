@@ -1,7 +1,31 @@
 #include <stdio.h>
+
+#define BYTE_TO_BINARY_PATTERN "%c%c%c%c%c%c%c%c"
+#define BYTE_TO_BINARY(byte)  \
+  (byte & 0x80 ? '1' : '0'), \
+  (byte & 0x40 ? '1' : '0'), \
+  (byte & 0x20 ? '1' : '0'), \
+  (byte & 0x10 ? '1' : '0'), \
+  (byte & 0x08 ? '1' : '0'), \
+  (byte & 0x04 ? '1' : '0'), \
+  (byte & 0x02 ? '1' : '0'), \
+  (byte & 0x01 ? '1' : '0') 
+
+
 typedef unsigned char uchar;
 typedef unsigned short ushort;
 typedef uchar bool;
+
+void BinaryPrint(char  byte)
+{
+    printf(BYTE_TO_BINARY_PATTERN, BYTE_TO_BINARY(byte));
+    printf("\n");
+}
+
+void HexPrint(uchar byte)
+{
+    printf("%x\n", byte);
+}
 
 typedef struct
 {
@@ -31,9 +55,6 @@ typedef struct
 Clock g_clock;
 RawClock g_rawClock;
 
-#define THIRTY_SIX_SECONDS 0x92
-#define TWENTY_THREE_HOURS 0x92
-#define TWENTY_FIVE_MINUTES 0x00
 
 bool IsBitSet(uchar* byValue, uchar);
 
@@ -43,60 +64,67 @@ bool IsBitSet(uchar* byValue, uchar byBitOffset)
 }
 
 
-void ReadHours(uchar value)
-{
-    //TODO: double check assumptions made here based of bit defitions from the datasheet.   
-    uchar temp = value;  
-    uchar digits = (temp & 0x0F);
-    //assume 1 means 24 hr clock i.e. after 12am.
-    uchar tens = 0;
-
-    tens = IsBitSet(&temp, 4);
-
-    if(IsBitSet(&temp, 7))
-    {
-        tens++;
-    }    
-
-    g_rawClock.hoursDigits = digits;
-    g_rawClock.hoursTens = tens;
-    g_clock.hours = (tens * 10) + digits;
-}
-
 void SetBitHigh(uchar* byValue, uchar byBitOffset)
 {
     *byValue |= (1U << byBitOffset);
 }
 
-void WriteHours(uchar hours)
+
+
+// void WriteDate(uchar date)
+// {
+//     uchar digits = date % 10;
+//     uchar tens = date / 10;
+//     printf("%d", tens);
+//     uchar encoded = digits;
+//     encoded |= (tens << 4);
+//     WriteByte(&encoded);    
+// }
+
+// void WriteMonth(uchar month)
+// {
+//     uchar digits = month % 10;
+//     uchar tens = month / 10;    
+//     uchar encoded = digits;
+//     if(tens == 1) encoded |= (tens << 4);
+//     WriteByte(&encoded);
+// }
+
+// void WriteDay(uchar day)
+// {
+//     WriteByte(&day);    
+// }
+
+// void WriteYear(uchar year)
+// {
+//     uchar digits = year % 10;    
+//     uchar tens = year / 10;
+//     uchar encoded = digits;    
+//     encoded |= (tens << 4);
+//     WriteByte(&encoded);    
+// }
+
+void WriteYear(uchar year)
 {
-    uchar encoded = 0;
-    uchar tens = hours / 10;    
-    printf("%d\n", tens);
-    uchar digits = hours % 10;
-    printf("%d\n", digits);
-    encoded = digits;    
-    if(hours > 12) 
-    {
-        SetBitHigh(&encoded, 7);        
-    }
-        
-    if(hours > 9)
-    {
-        SetBitHigh(&encoded, 4);  
-    }
-    
-    printf("%#010x", encoded);
+    uchar digits = year % 10;    
+    uchar tens = year / 10;
+    uchar encoded = digits;    
+    encoded |= (tens << 4);
+    BinaryPrint(encoded); 
 }
 
+void ReadYear()
+{
+    uchar temp = 0x96; 
+    uchar tens = (temp & 0xF0) >> 4;
+    uchar digits = (temp & 0x0F);
+    g_clock.year = (tens * 10) + digits;
+}
 
 int main()
-{
-    ReadHours(TWENTY_THREE_HOURS);
-    printf("%d\n", g_clock.hours);
-    WriteHours(10);
-
-
-
+{        
+    WriteYear(96);
+    ReadYear();
+    printf("%d\n", g_clock.year);
     return 0;
 }
