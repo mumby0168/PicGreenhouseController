@@ -64,6 +64,11 @@ void WriteDate(uchar data);
 void WriteSeconds(uchar seconds);
 void WriteHours(uchar hours);
 void WriteMinutes(uchar minutes);
+void WriteDate(uchar date);
+void WriteMonth(uchar month);
+void WriteDay(uchar day);
+void WriteYear(uchar year);
+
 
 
 //Read Operations
@@ -83,7 +88,11 @@ void WriteByte(uchar*);
 
 //Higher level Lib
 void SetTime(uchar hours, uchar minutes, uchar seconds);
+void SetDate(uchar day, uchar date, uchar month, uchar year);
 void ReadTime();
+void ReadCalendar();
+
+void WriteCalenderToLcd();
 
 void Init();
 
@@ -95,7 +104,7 @@ typedef struct
     uchar date;
     uchar day;
     uchar month;
-    ushort year;
+    uchar year;
 } Clock;
 
 typedef struct 
@@ -179,6 +188,19 @@ inline void memset(void* const ptr, const unsigned char c, const unsigned int le
 
 #define ZERO_MEMORY(ptr, type) memset(ptr, 0, sizeof(type))
 
+void WriteCalenderToLcd()
+{
+    WriteCharacter('C');
+    WriteNumber(g_clock.day);
+    WriteCharacter(58); // :
+    WriteNumber(g_clock.date);
+    WriteCharacter(58); // :
+    WriteNumber(g_clock.month);
+    WriteCharacter(58); // :
+    WriteNumber(g_clock.year);    
+}
+
+
 void WriteTimeToLcd()
 {
     WriteNumber(g_rawClock.hoursTens);
@@ -201,14 +223,19 @@ void main(void) {
     Initialise();
     
     ClearDisplay();
-    SetDisplayResolution(true, false);        
+    SetDisplayResolution(true, false);   
+        
     
-    SetTime(12, 59, 45);
+    SetTime(23, 59, 45);    
+    SetDate(4, 31, 12, 95);
 
     while (true)
     {        
-        ClearDisplay();          
+        ClearDisplay();            
         ReadTime();    
+        ReadCalendar();        
+        WriteCalenderToLcd();
+        SetCursorPosition(true, 0);
         WriteTimeToLcd();
         SetDisplayMode(true, false, false);        
     }  
@@ -250,6 +277,44 @@ void SetTime(uchar hours, uchar minutes, uchar seconds)
 
     WriteCommandByte(WRITE_SECONDS);
     WriteSeconds(seconds);
+    COMPLETE_OPERATION
+}
+
+void ReadCalendar()
+{
+    WriteCommandByte(READ_DAY);
+    ReadDay();
+    COMPLETE_OPERATION
+
+    WriteCommandByte(READ_DATE);
+    ReadDate();
+    COMPLETE_OPERATION
+
+    WriteCommandByte(READ_MONTH);
+    ReadMonth();
+    COMPLETE_OPERATION
+
+    WriteCommandByte(READ_YEAR);
+    ReadYear();
+    COMPLETE_OPERATION
+}
+
+void SetDate(uchar day, uchar date, uchar month, uchar year)
+{
+    WriteCommandByte(WRITE_DAY);
+    WriteDay(day);
+    COMPLETE_OPERATION
+
+    WriteCommandByte(WRITE_DATE);
+    WriteDate(date);
+    COMPLETE_OPERATION
+
+    WriteCommandByte(WRITE_MONTH);
+    WriteMonth(month);
+    COMPLETE_OPERATION
+
+    WriteCommandByte(WRITE_YEAR);
+    WriteYear(year);
     COMPLETE_OPERATION
 }
 
@@ -306,6 +371,38 @@ void WriteHours(uchar hours)
     }
     
     WriteByte(&encoded);
+}
+
+void WriteDate(uchar date)
+{
+    uchar digits = date % 10;
+    uchar tens = date / 10;    
+    uchar encoded = digits;
+    encoded |= (tens << 4);
+    WriteByte(&encoded);    
+}
+
+void WriteMonth(uchar month)
+{
+    uchar digits = month % 10;
+    uchar tens = month / 10;    
+    uchar encoded = digits;
+    if(tens == 1) encoded |= (tens << 4);
+    WriteByte(&encoded);
+}
+
+void WriteDay(uchar day)
+{
+    WriteByte(&day);    
+}
+
+void WriteYear(uchar year)
+{
+    uchar digits = year % 10;    
+    uchar tens = year / 10;
+    uchar encoded = digits;    
+    encoded |= (tens << 4);
+    WriteByte(&encoded);    
 }
 
 
@@ -365,7 +462,7 @@ void ReadHours()
 void ReadDate()
 {
     uchar temp = AssembleByte();
-    uchar tens = (temp & 0x30);
+    uchar tens = (temp & 0x30) >> 4;
     uchar digits = (temp & 0x0F);
     g_clock.date = (tens * 10) + digits;    
 }
@@ -374,20 +471,20 @@ void ReadMonth()
 {    
     uchar temp = AssembleByte();  
     uchar digits = (temp & 0x0F);
-    uchar tens = (temp & 0x10);
+    uchar tens = (temp & 0x10) >> 4;
     g_clock.month = (tens * 10) + digits;
 }
 
 void ReadDay()
 {    
     uchar temp = AssembleByte();
-    g_clock.day = (temp & 0x07);
+    g_clock.day = temp;
 }
 
 void ReadYear()
 {
     uchar temp = AssembleByte(); 
-    uchar tens = (temp & 0xF0);
+    uchar tens = (temp & 0xF0) >> 4;
     uchar digits = (temp & 0x0F);
     g_clock.year = (tens * 10) + digits;
 }
