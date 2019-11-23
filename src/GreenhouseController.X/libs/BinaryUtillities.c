@@ -1,5 +1,5 @@
-#include "std.h"
-#include "BitUtillities.h"
+
+#include "BinaryUtillities.h"
 
 inline void SetBitHigh(uchar* byValue, uchar byBitOffset)
 {

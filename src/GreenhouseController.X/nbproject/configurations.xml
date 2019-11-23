@@ -11,6 +11,9 @@
         <itemPath>drivers/therm.h</itemPath>
         <itemPath>drivers/timing-chip.h</itemPath>
       </logicalFolder>
+      <logicalFolder name="f2" displayName="Libs" projectFiles="true">
+        <itemPath>libs/BinaryUtillities.h</itemPath>
+      </logicalFolder>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -26,7 +29,10 @@
         <itemPath>drivers/therm.c</itemPath>
         <itemPath>drivers/timing-chip.c</itemPath>
       </logicalFolder>
-      <itemPath>main.c.c</itemPath>
+      <logicalFolder name="f2" displayName="Libs" projectFiles="true">
+        <itemPath>libs/BinaryUtillities.c</itemPath>
+      </logicalFolder>
+      <itemPath>drivers/main.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -36,6 +42,7 @@
   </logicalFolder>
   <sourceRootList>
     <Elem>drivers</Elem>
+    <Elem>libs</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

@@ -56,8 +56,6 @@
 
 // end command defs
 
-typedef unsigned short int ushort;
-
 
 //Write Operations
 void WriteDate(uchar data);
@@ -88,7 +86,7 @@ void WriteByte(uchar*);
 
 //Higher level Lib
 void SetTime(uchar hours, uchar minutes, uchar seconds);
-void SetDate(uchar day, uchar date, uchar month, uchar year);
+void SetCalendar(uchar day, uchar date, uchar month, uchar year);
 void ReadTime();
 void ReadCalendar();
 

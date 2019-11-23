@@ -1,7 +1,7 @@
 #ifndef BIT_UTILLITIES_H
 #define	BIT_UTILLITIES_H
-
-#include "std.h"
+typedef unsigned char bool;
+typedef unsigned char uchar;
 
 inline void SetBitHigh(uchar* byValue, uchar byBitOffset);
 inline void SetBitLow(uchar* byValue, uchar byBitOffset);
