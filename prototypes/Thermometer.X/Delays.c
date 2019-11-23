@@ -18,7 +18,6 @@ enum _tmr0PreScalerValues
 void EnableTimerZeroInterrupt()
 {
     SetBitLow(&INTCON, 2); //Clear the TMR0 overflow bit
-    SetBitHigh(&INTCON, 7); //Enable  - ensures they are actually enabled
     SetBitHigh(&INTCON, 5); //Enable TMR0 interrupt    
 }
 

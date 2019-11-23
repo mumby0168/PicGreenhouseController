@@ -21,144 +21,80 @@ void delay(char x,char y)
      }while(--x);
 }
 
-void WriteZero(void)
-{
-    TRISA0 = 0;
-    RA0 = 0;
-    DelayMicroSeconds(75);
-}
-
-void WriteOne(void)
-{
-    DelayMicroSeconds(2);
-    TRISA0 = 0;
-    RA0 = 0;
-    
-    DelayMicroSeconds(10);
-    RA0 = 1;
-    DelayMicroSeconds(60);
-}
-
 void WriteByte(uchar byte)
 {
     for (char i = 0; i < 8; i++)
-    {
-        if ((byte >> i) & 1)
+    {                 
+        RA0 = 1;
+        TRISA0 = 0;
+        NOP();                                                                              
+        NOP();                                                                              
+        NOP();                                                                              
+        NOP();                                                                              
+        NOP();    
+        if ((byte >> i) & 1) 
         {
-            WriteOne();
-        }
-        else
-        {
-            WriteZero();
-        }
+            TRISA = 1;
+        }   
+        DelayMicroSeconds(63);
+        NOP();
+        NOP();
     }
     
     TRISA0 = 1;
-}
-
-char ReadBit(void)
-{
-    TRISA0 = 0;
-    RA0 = 0;
-    
-    DelayMicroSeconds(8);
-    
-    TRISA0 = 1;
-    
-    char ret = RA0;    
-    return ret;
 }
 
 uchar ReadByte(void)
 {
     uchar ret = 0;    
     for (char i = 0; i < 8; i++)
-        ret |= ReadBit() << i;
+    {
+        TRISA0 = 0;
+        RA0 = 0;
+
+        DelayMicroSeconds(8);
+
+        TRISA0 = 1;
+
+         ret |= RA0 << i;
+    }
+       
     
     return ret;
 }
 
-inline void SkipRom(void)
-{
-    WriteByte(0xCC);
-}
-
 uchar Reset(void)
 {
-    char presence=1;
-    while(presence)
-    { 
-        ClearDisplay();
-        WriteCharacter(48);
-        RA0 = 0;
-        TRISA0 = 0;//MAIN MCU PULL LOW                                                                       
-        DelayMicroSeconds(503);                              //delay 503us                                                                             
-        TRISA0 = 1;                                //release general line and wait for resistance pull high general line and keep 15~60us    
-        uchar uiElapsed = 0;
-        while (RA0 == 1)
-        {
-            if (uiElapsed > 120)
-                return 0x12;
-
-            uiElapsed += 2;
-        }                                                                            
-        uiElapsed = 0;
-        while (RA0 == 0)
-        {
-            if (uiElapsed > 240)
-                return 0x13;
-
-            uiElapsed += 2;
-        };
-        presence = 0;//receive responsion signal                                                               
-        DelayMicroSeconds(430);                           //delay 430us                                                                             
-     }
-    
-    /*
-    //Bring RA0 low for 500us
     RA0 = 0;
-    TRISA0 = 0;
-    
-    DelayMicroSeconds(600);
-    
-    //Release control of RA0
-    TRISA0 = 1;
-    
-    //wait for it to return to high
-    unsigned int uiElapsed = 0;
-    while (RA0 == 0)
-    {
-        if (uiElapsed > 60)
-            return 0x11;
-        
-        uiElapsed += 2;
-    }
-        
-    //Wait for the thermomiter to pull RA0 low
-    uiElapsed = 0;
+    TRISA0 = 0;          
+
+    delay(2,70);
+
+    TRISA0 = 1;  
+
+    uchar uiElapsed = 0;
     while (RA0 == 1)
     {
-        if (uiElapsed > 60)
+        if (uiElapsed > 120)
             return 0x12;
-        
+
         uiElapsed += 2;
-    }
-    
+    }             
+
     uiElapsed = 0;
     while (RA0 == 0)
     {
         if (uiElapsed > 240)
             return 0x13;
-        
+
         uiElapsed += 2;
     };
+
+    delay(2,60);
     
-    DelayMicroSeconds(480);
-    
-    SkipRom();
+    WriteByte(0xCC); //skip rom
     
     return 0;
-     * */
 }
 
 uchar ConvertT(void)
@@ -198,15 +134,15 @@ uchar ReadScratchpad()
 //    {
 //        ReadByte();
 //    }
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
-//    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempMsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
+    g_ScratchPad.byTempLsb = ReadByte();
     
     byStatus = Reset();
     
@@ -241,21 +177,23 @@ void main(void)
     ClearDisplay();
     SetDisplayResolution(true, false); 
     SetDisplayMode(true, false, false);
+    
+    WriteString("Start.");
+    
     while (true)
-    {        
-        uchar byRes = Reset();
+    {   
         ClearDisplay();
+        uchar byRes = ConvertT();
+        byRes = ReadScratchpad();
         if (byRes == 0)
         {
-            WriteString("Success");
-            WriteCharacter(58);
-            PrintValue_Char(128);
+            WriteString("Success: ");
+            PrintValue_Char(g_ScratchPad.byTempMsb);
         }
         else
         {
             WriteString("Failed.");
         }
-        DelaySeconds(2);
     };
     
     return;
