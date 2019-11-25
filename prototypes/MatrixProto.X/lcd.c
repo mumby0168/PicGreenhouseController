@@ -1,32 +1,17 @@
 #include "lcd.h"
 
-#define RS RA1
-#define RW RA2
+#define RS RA5
+#define RW RA4
 #define Enable RA3
+#define SERIAL_OR_BUS RA2
 
-inline void WriteCommand(uchar cmd)
-{
-    TRISD = 0x00;
-    RS = 0;
-    RW = 0; 
-    PORTD = cmd;   
-    Enable = 0;
-    delay();
-    Enable = 1;
-    PORTD = 0;
-}
+void WriteCommand(uchar);
 
 void delay() { int i;for(i=0;i<5000;i++); }
 
 void SetDisplayMode(bool displayOn, bool cursorOn, bool cursorBlink)
 {
     WriteCommand(0b00001000 | displayOn << 2 | cursorOn << 1 | cursorBlink);  
-}
-
-//If display two lines is true, display large font will be ignored
-void SetDisplayResolution(bool displayTwoLines, bool displayLargeFont)
-{
-    WriteCommand(0b00110000 | displayTwoLines << 3 | displayLargeFont << 2);
 }
 
 void ClearDisplay()
@@ -54,26 +39,16 @@ void SetDdramAddress(uchar addr)
     WriteCommand(0b10000000 | addr);
 }
 
-void SetCursorPosition(bool secondLine, uchar pos)
+void SetCursorPosition(uchar line, uchar pos)
 {
     MoveCursorToStart();
     if (pos > 39)
         pos = 39;
     
-    if (secondLine)
-        pos += 40;
+    if(pos > 0)
+        pos += line + 40;
     
     SetDdramAddress(pos);
-}
-
-void WriteCharacter(char c)
-{
-    RS = 1;
-    RW = 0;
-    PORTD = c;
-    Enable = 0;
-    delay();
-    Enable = 1;
 }
 
 void WriteNumber(char num)
@@ -92,6 +67,28 @@ void WriteNumber(char num)
     WriteCharacter(digits + 48);
 }
 
+void WriteCharacter(char c)
+{
+    RS = 1;
+    RW = 0;
+    PORTD = c;
+    Enable = 0;
+    delay();
+    Enable = 1;
+}
+
+void WriteCommand(uchar cmd)
+{
+    TRISD = 0x00;
+    RS = 0;
+    RW = 0; 
+    PORTD = cmd;   
+    Enable = 0;
+    delay();
+    Enable = 1;
+    PORTD = 0;
+}
+
 void Initialise()
 {
     // 1: input 0: output
@@ -100,4 +97,6 @@ void Initialise()
     TRISD = 0b00000000;
     PORTA = 0x00;
     PORTD = 0x00;
+    SERIAL_OR_BUS = 1;
+    WriteCommand(0b00010000); // This says use basic instruction set i.e (B2 = 0) and use 8bit interface i.e (B4 = 1)
 }

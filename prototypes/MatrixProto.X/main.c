@@ -107,7 +107,7 @@ void CheckKeys()
 
 void WriteKeysToLcd()
 {
-    SetCursorPosition(false, 0);
+    SetCursorPosition(0, 0);
     WriteNumber(g_Keys.Column1.one);
     WriteNumber(g_Keys.Column1.two);
     WriteNumber(g_Keys.Column1.three);
@@ -120,7 +120,7 @@ void WriteKeysToLcd()
     WriteNumber(g_Keys.Column2.three);
     WriteNumber(g_Keys.Column2.four);
     
-    SetCursorPosition(true, 0);
+    SetCursorPosition(3, 0);
     
     WriteNumber(g_Keys.Column3.one);
     WriteNumber(g_Keys.Column3.two);
@@ -143,14 +143,14 @@ void main(void) {
 
     Init();
     Initialise();
-    SetDisplayMode(true, false, false);
-    SetDisplayResolution(true, false);
+    SetDisplayMode(true, false, false);   
+
 
     while (1)
     {
         ClearDisplay();
         CheckKeys();
-        WriteKeysToLcd();
+        WriteKeysToLcd();        
         SetDisplayMode(true, false, false);
     }
     
