@@ -25,41 +25,46 @@ void WriteByte(uchar byte)
 {
     for (char i = 0; i < 8; i++)
     {                 
-        RA0 = 1;
-        TRISA0 = 0;
-        NOP();                                                                              
-        NOP();                                                                              
-        NOP();                                                                              
-        NOP();                                                                              
-        NOP();    
-        if ((byte >> i) & 1) 
-        {
-            TRISA = 1;
-        }   
-        DelayMicroSeconds(63);
-        NOP();
-        NOP();
+    TRISA0 = 0;
+    RA0 = 0;//shift the lowest bit                                                                             
+   NOP();                                                                              
+   NOP();                                                                              
+   NOP();                                                                              
+   NOP();                                                                              
+   NOP();                                     //pull high to low,produce write time    
+   if ((byte >> i) & 1)  TRISA0 = 1;                    //if write 1,pull high                   
+   delay(2,7);                                //delay 63us                             
+   TRISA0 = 1;                                                                          
+   NOP();                                                                              
+   NOP();                                                                                                              //right shift a bit
     }
     
     TRISA0 = 1;
 }
 
 uchar ReadByte(void)
-{
+{ 
     uchar ret = 0;    
     for (char i = 0; i < 8; i++)
     {
-        TRISA0 = 0;
         RA0 = 0;
-
-        DelayMicroSeconds(8);
-
-        TRISA0 = 1;
-
-         ret |= RA0 << i;
+        TRISA0 = 0;
+        NOP();
+        NOP();
+        NOP();
+        NOP();
+        NOP();
+        NOP();                                    //6us              
+        TRISA0 = 1;      
+        NOP();                                                       
+        NOP();                                                       
+        NOP();                                                       
+        NOP();                                                       
+        NOP();                                   //4us               
+        ret |= RA0 << i;                                        
+        delay(2,7);                              //63us 
     }
        
-    
     return ret;
 }
 
@@ -122,27 +127,21 @@ typedef struct _scratchPad
 
 ScratchPad g_ScratchPad;
 
-uchar ReadScratchpad()
+uchar ReadScratchpad(ScratchPad* pScratchPad)
 {
     uchar byStatus = 0;
     if ((byStatus = Reset()) != 0)
         return byStatus;
 
-    WriteByte(0x4E);
+    WriteByte(0xBE);
     
-//    for (int i = 0; i < 9; i++)
-//    {
-//        ReadByte();
-//    }
+    /*
+    for (uchar* pSpEntry = pScratchPad; pSpEntry < pSpEntry + sizeof(ScratchPad); pSpEntry++)
+        *pSpEntry = ReadByte();
+    */
+    
     g_ScratchPad.byTempLsb = ReadByte();
     g_ScratchPad.byTempMsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
-    g_ScratchPad.byTempLsb = ReadByte();
     
     byStatus = Reset();
     
@@ -183,12 +182,20 @@ void main(void)
     while (true)
     {   
         ClearDisplay();
-        uchar byRes = ConvertT();
-        byRes = ReadScratchpad();
-        if (byRes == 0)
+        Reset();
+        WriteByte(0x44);
+        DelaySeconds(1);
+        Reset();
+        WriteByte(0xBE);
+        char byOne = ReadByte();
+        char byTwo = ReadByte();
+        if (0 == 0)
         {
             WriteString("Success: ");
-            PrintValue_Char(g_ScratchPad.byTempMsb);
+            SetCursorPosition(true, 0);
+            PrintValue_Char(byOne);
+            WriteCharacter(' ');
+            PrintValue_Char(byTwo);
         }
         else
         {
