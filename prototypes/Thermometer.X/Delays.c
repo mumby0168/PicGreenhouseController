@@ -33,25 +33,6 @@ inline void DisableTimerZeroInterrupt()
     SetBitLow(&INTCON, 5); //Disable TMR0 interrupt
 }
 
-void DelayMicroSeconds(unsigned int uiDelay)
-{
-    uchar byNumberOfCycles = 1 + (uchar)((double)uiDelay / 512);
-    TMR0 = 256 - (uchar)((4000000 * uiDelay) / 4 * byNumberOfCycles);
-
-    ConfigureTimerZeroInterrupt(TMR0_PRE_SCALER_2);
-    EnableTimerZeroInterrupt();
-    
-    uchar byCycleCount = 0;
-    while (byCycleCount < byNumberOfCycles)
-    {
-        while (!IsBitSet(&INTCON, 2));
-        SetBitLow(&INTCON, 2);
-        byCycleCount++;
-    };
-    
-    DisableTimerZeroInterrupt();
-}
-
 void DelayMilliSeconds(unsigned int uiDelay)
 {
     uchar byNumberOfCycles = 1 + (uchar)((double)uiDelay / 65.536);

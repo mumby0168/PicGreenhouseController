@@ -14,14 +14,16 @@
 
 void delay(char x,char y) 
 {
+    //d = 14+(3*(Y-1)+7)
+    //(d - 14) = 3((y-1)+7)
+    // 
+    
   char z;
   do{
       z=y;
       do{;}while(--z);
      }while(--x);
 }
-
-#include "example.c"
 
 void WriteByte(uchar val)
 {
@@ -42,7 +44,7 @@ void WriteByte(uchar val)
         if(byBitValue == 1)
             TRISA0 = 1; //if write 1,pull high   
         
-        delay(2, 7); //63us
+        DELAY_MICRO_SECONDS(63); //63us
         TRISA0 = 1;                                                                          
         
         NOP();                                                                              
@@ -72,7 +74,7 @@ uchar ReadByte(void)
         NOP();                                                       
         NOP();                                   //4us               
         ret |= RA0 << i;                                        
-        DelayMicroSeconds(63);                             //63us 
+        DELAY_MICRO_SECONDS(63);                             //63us 
     }
        
     return ret;
@@ -83,7 +85,7 @@ uchar Reset(void)
     RA0 = 0;
     TRISA0 = 0;          
 
-    DelayMicroSeconds(504);
+    DELAY_MICRO_SECONDS(504);
 
     TRISA0 = 1;  
 
@@ -105,7 +107,7 @@ uchar Reset(void)
         uiElapsed += 2;
     };
 
-    DelayMicroSeconds(430);
+    DELAY_MICRO_SECONDS(430);
     
     WriteByte(0xCC); //skip rom
     
