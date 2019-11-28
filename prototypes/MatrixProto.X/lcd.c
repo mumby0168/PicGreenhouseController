@@ -1,8 +1,9 @@
 #include "lcd.h"
 
-#define RS RA5
+#define RS RA0
 #define RW RA4
 #define Enable RA3
+#define DORI RA5
 #define SERIAL_OR_BUS RA2
 
 void WriteCommand(uchar);
@@ -70,6 +71,7 @@ void WriteNumber(char num)
 void WriteCharacter(char c)
 {
     RS = 1;
+    DORI = 1;
     RW = 0;
     PORTD = c;
     Enable = 0;
@@ -81,6 +83,7 @@ void WriteCommand(uchar cmd)
 {
     TRISD = 0x00;
     RS = 0;
+    DORI = 0;
     RW = 0; 
     PORTD = cmd;   
     Enable = 0;
@@ -98,5 +101,5 @@ void Initialise()
     PORTA = 0x00;
     PORTD = 0x00;
     SERIAL_OR_BUS = 1;
-    WriteCommand(0b00010000); // This says use basic instruction set i.e (B2 = 0) and use 8bit interface i.e (B4 = 1)
+    //WriteCommand(0b00010000); // This says use basic instruction set i.e (B2 = 0) and use 8bit interface i.e (B4 = 1)
 }
