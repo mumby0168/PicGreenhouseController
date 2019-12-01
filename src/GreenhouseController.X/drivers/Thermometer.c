@@ -1,7 +1,7 @@
 #include <xc.h>
 #include "Thermometer.h"
-#include "BitUtillities.h"
-#include "Delays.h"
+#include "../libs/BinaryUtillities.h"
+#include "../libs/Delays.h"
 
 static void thermometer_write_byte(uchar val)
 {

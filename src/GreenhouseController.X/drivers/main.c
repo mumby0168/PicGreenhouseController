@@ -12,6 +12,7 @@
 #include "../drivers/lcd.h"
 #include "../libs/std.h"
 #include "../libs/Delays.h"
+#include "Thermometer.h"
 
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
@@ -28,8 +29,23 @@ void Init()
     Matrix_Init();    
 }
 
-void main(void) {
-    
+void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
+{
+    if (temperatureBcdValue->bIsNegative)
+        Lcd_WriteCharacter('-');
+
+    Lcd_WriteCharacter(temperatureBcdValue->ubyHundreds + 48);
+    Lcd_WriteCharacter(temperatureBcdValue->ubyTens + 48);
+    Lcd_WriteCharacter(temperatureBcdValue->ubyUnits + 48);
+    Lcd_WriteCharacter('.');
+    Lcd_WriteCharacter(temperatureBcdValue->ubyTenths + 48);
+    Lcd_WriteCharacter(temperatureBcdValue->ubyHundredths + 48);
+    Lcd_WriteCharacter(temperatureBcdValue->ubyThousandths + 48);
+    Lcd_WriteCharacter(temperatureBcdValue->ubyTenThousandths + 48);
+}
+
+void main(void) 
+{   
     Init();
     
     Lcd_SetDisplayMode(true, false, false);
@@ -39,6 +55,8 @@ void main(void) {
     while(1)
     {        
         Lcd_ClearDisplay();
+        
+        //Timer
         Timing_ReadTime();       
         Lcd_WriteNumber(g_rawClock.hoursTens);
         Lcd_WriteNumber(g_rawClock.hoursDigits);
@@ -49,6 +67,30 @@ void main(void) {
         Lcd_WriteNumber(g_rawClock.secondsTens);
         Lcd_WriteNumber(g_rawClock.secondDigits);                       
         Lcd_SetDisplayMode(true, false, false);
+        
+        //Therm
+        Lcd_SetCursorPosition(1, 2);
+        
+        if (Thermometer_ProcessTemperature() != 0)
+        {
+            Lcd_WriteString("Failed to process temperature.");
+            continue;
+        }
+        
+        DelayMilliSeconds(750);
+
+        Thermometer_ScratchPad scratchPad;
+        if (Thermometer_ReadScratchPad(&scratchPad, 2) != 0)
+        {
+            Lcd_WriteString("Failed to read scratch pad.");
+            continue;
+        }
+        
+        Thermometer_BcdTemperature temperatureBcdValue;
+        Thermometer_ConvertTempratureToBcd(scratchPad.byTempMsb, scratchPad.byTempLsb, &temperatureBcdValue);        
+        PrintTemperatureBcdValue(&temperatureBcdValue);
+        
+        DelayMilliSeconds(200);
     }
     
     return;

@@ -3,7 +3,7 @@
 #include "Delays.h"
 #include "BinaryUtillities.h"
 
-enum _tmr0PreScalerValues
+typedef enum _tmr0PreScalerValues
 {
     TMR0_PRE_SCALER_2 = 0,
     TMR0_PRE_SCALER_4 = 1,
@@ -13,24 +13,34 @@ enum _tmr0PreScalerValues
     TMR0_PRE_SCALER_64 = 5,
     TMR0_PRE_SCALER_128 = 6,
     TMR0_PRE_SCALER_256 = 7
-};
+} TimerZeroPreScalerValues;
 
-void EnableTimerZeroInterrupt()
+static void enable_timer_zero_interrupt()
 {
     SetBitLow(&INTCON, 2); //Clear the TMR0 overflow bit
     SetBitHigh(&INTCON, 5); //Enable TMR0 interrupt    
 }
 
-void ConfigureTimerZeroInterrupt(TimerZeroPreScalerValues byPreScaler)
+static void configure_timer_zero_interrupt(TimerZeroPreScalerValues byPreScaler)
 {
     SetBitLow(&OPTION_REG, 5); //use the internal clock
     SetBitLow(&OPTION_REG, 3); //assign prescaler to timer zero not watch dog timer
     SetLowNibble(&OPTION_REG, (uchar)byPreScaler); // values are defined in enum, as 7 is make bit 4 will always be low which is correct
 }
 
-inline void DisableTimerZeroInterrupt()
+inline static void disable_timer_zero_interrupt()
 {
     SetBitLow(&INTCON, 5); //Disable TMR0 interrupt
+}
+
+void DelayMicroSeconds(uchar x, uchar y)
+{
+    uchar z = 0;
+    do
+    {
+        z = y;
+        do {;} while(--z);
+    } while(--x);
 }
 
 void DelayMilliSeconds(unsigned int uiDelay)
@@ -38,8 +48,8 @@ void DelayMilliSeconds(unsigned int uiDelay)
     uchar byNumberOfCycles = 1 + (uchar)((double)uiDelay / 65.536);
     TMR0 = 256 - ((4000000 * uiDelay) / 4 * 256 * byNumberOfCycles);
 
-    ConfigureTimerZeroInterrupt(TMR0_PRE_SCALER_256);
-    EnableTimerZeroInterrupt();
+    configure_timer_zero_interrupt(TMR0_PRE_SCALER_256);
+    enable_timer_zero_interrupt();
     
     uchar byCycleCount = 0;
     while (byCycleCount < byNumberOfCycles)
@@ -49,7 +59,7 @@ void DelayMilliSeconds(unsigned int uiDelay)
         byCycleCount++;
     };
     
-    DisableTimerZeroInterrupt();
+    disable_timer_zero_interrupt();
 }
 
 void DelaySeconds(unsigned int uiDelay)
@@ -57,8 +67,8 @@ void DelaySeconds(unsigned int uiDelay)
     uchar byNumberOfCycles = 1 + (uchar)((double)uiDelay / 0.065536);
     TMR0 = 256 - ((4000000 * uiDelay) / 4 * 256 * byNumberOfCycles);
 
-    ConfigureTimerZeroInterrupt(TMR0_PRE_SCALER_256);
-    EnableTimerZeroInterrupt();
+    configure_timer_zero_interrupt(TMR0_PRE_SCALER_256);
+    enable_timer_zero_interrupt();
     
     uchar byCycleCount = 0;
     while (byCycleCount < byNumberOfCycles)
@@ -68,5 +78,5 @@ void DelaySeconds(unsigned int uiDelay)
         byCycleCount++;
     };
     
-    DisableTimerZeroInterrupt();
+    disable_timer_zero_interrupt();
 }

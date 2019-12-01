@@ -1,21 +1,11 @@
 #ifndef DELAYS_H
 #define	DELAYS_H
 
-typedef enum _tmr0PreScalerValues TimerZeroPreScalerValues;
+#include "std.h"
 
+#define DELAY_MICRO_SECONDS(delay) DelayMicroSeconds(2, ((delay - 35) / 3) + 1)
 
-#define DELAY_MICRO_SECONDS(delay) \
-\
-{ \
-    const char y = ((delay - 35) / 3) + 1; \
-    char x = 2, z = 0; \
-    do \
-    { \
-        z = y; \
-        do {;} while(--z); \
-    } while(--x); \
-} \
-
+void DelayMicroSeconds(uchar x, uchar y);
 void DelayMilliSeconds(unsigned int uiDelay);
 void DelaySeconds(unsigned int uiDelay);
 
