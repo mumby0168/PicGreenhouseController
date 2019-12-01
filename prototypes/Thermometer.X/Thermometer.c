@@ -180,42 +180,42 @@ void Thermometer_ConvertTempratureToBcd(uchar ubyTempMsb, uchar ubyTempLsb, Ther
     char byIntegerPart = (ubyTempMsb & 0b00000111) << 4 | GetHighNibble(&ubyTempLsb);
     uchar ubySignedPart = ubyTempMsb & 0xF8;
     short sDecimalValue = 0;
-    
+
+    uchar byDecimalPart = GetLowNibble(&ubyTempLsb);
+
+    //2^-4
+    if (byDecimalPart & 0x01)
+        sDecimalValue += 625;
+
+    //2^-3
+    if (byDecimalPart & 0x02)
+        sDecimalValue += 1250;
+
+    //2^-2
+    if (byDecimalPart & 0x04)
+        sDecimalValue += 2500;
+
+    //2^-1
+    if (byDecimalPart & 0x08)
+        sDecimalValue += 5000;
+
     if (ubySignedPart != 0)
     {
         pBcdTemperature->bIsNegative = true;
         byIntegerPart -= 128;
         byIntegerPart *= -1;
+
+        if (byDecimalPart != 0)
+        {
+            sDecimalValue -= 10000;
+            sDecimalValue *= -1;
+            byIntegerPart--;
+        }
     }
-    
+
     pBcdTemperature->ubyHundreds = (byIntegerPart / 100);
     pBcdTemperature->ubyTens = ((byIntegerPart / 10) % 10);
     pBcdTemperature->ubyUnits = (byIntegerPart % 10);
-
-    uchar byDecimalPart = GetLowNibble(&ubyTempLsb);
-    
-    //2^-4
-    if (byDecimalPart & 0x01)
-        sDecimalValue += 625;
-    
-    //2^-3
-    if (byDecimalPart & 0x02)
-        sDecimalValue += 1250;
-    
-    //2^-2
-    if (byDecimalPart & 0x04)
-        sDecimalValue += 2500;
-    
-    //2^-1
-    if (byDecimalPart & 0x08)
-        sDecimalValue += 5000;
-    
-    if (ubySignedPart != 0 && byDecimalPart != 0)
-    {
-        sDecimalValue -= 10000;
-        sDecimalValue *= -1;
-    }
-    
     pBcdTemperature->ubyTenths = ((sDecimalValue / 1000));
     pBcdTemperature->ubyHundredths = (((sDecimalValue % 1000) / 100));
     pBcdTemperature->ubyThousandths = (((sDecimalValue % 100) / 10));

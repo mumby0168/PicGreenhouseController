@@ -30,39 +30,49 @@ void Thermometer_ConvertTempratureToBcd(uchar ubyTempMsb, uchar ubyTempLsb, Ther
 {
     pBcdTemperature->bIsNegative = false;
     //get bottom 3 bits of msb and tack it on to the high nibble of lsb to make the integer part
-    uchar ubyIntegerPart = (ubyTempMsb & 0x07) << 4 | GetHighNibble(&ubyTempLsb);
+    char byIntegerPart = (ubyTempMsb & 0b00000111) << 4 | GetHighNibble(&ubyTempLsb);
     uchar ubySignedPart = ubyTempMsb & 0xF8;
+    short sDecimalValue = 0;
     
-    if (ubySignedPart != 0)
-        pBcdTemperature->bIsNegative = true;
-        
-    pBcdTemperature->ubyHundreds = (ubyIntegerPart / 100) + 48;
-    pBcdTemperature->ubyTens = ((ubyIntegerPart / 10) % 10) + 48;
-    pBcdTemperature->ubyUnits = (ubyIntegerPart % 10) + 48;
-
     uchar byDecimalPart = GetLowNibble(&ubyTempLsb);
     
-    unsigned short usDecimalValue = 0;
     //2^-4
     if (byDecimalPart & 0x01)
-        usDecimalValue += 625;
+        sDecimalValue += 625;
     
     //2^-3
     if (byDecimalPart & 0x02)
-        usDecimalValue += 1250;
+        sDecimalValue += 1250;
     
     //2^-2
     if (byDecimalPart & 0x04)
-        usDecimalValue += 2500;
+        sDecimalValue += 2500;
     
     //2^-1
     if (byDecimalPart & 0x08)
-        usDecimalValue += 5000;
+        sDecimalValue += 5000;
     
-    pBcdTemperature->ubyTenths = ((usDecimalValue / 1000) + 48);
-    pBcdTemperature->ubyHundredths = (((usDecimalValue % 1000) / 100) + 48);
-    pBcdTemperature->ubyThousandths = (((usDecimalValue % 100) / 10) + 48);
-    pBcdTemperature->ubyTenThousandths = ((usDecimalValue % 10) + 48);
+    if (ubySignedPart != 0)
+    {
+        pBcdTemperature->bIsNegative = true;
+        byIntegerPart -= 128;
+        byIntegerPart *= -1;
+
+        if (byDecimalPart != 0)
+        {
+            sDecimalValue -= 10000;
+            sDecimalValue *= -1;
+            byIntegerPart--;
+        }
+    }
+
+    pBcdTemperature->ubyHundreds = (byIntegerPart / 100);
+    pBcdTemperature->ubyTens = ((byIntegerPart / 10) % 10);
+    pBcdTemperature->ubyUnits = (byIntegerPart % 10);
+    pBcdTemperature->ubyTenths = ((sDecimalValue / 1000));
+    pBcdTemperature->ubyHundredths = (((sDecimalValue % 1000) / 100));
+    pBcdTemperature->ubyThousandths = (((sDecimalValue % 100) / 10));
+    pBcdTemperature->ubyTenThousandths = ((sDecimalValue % 10));
 }
 
 float Thermometer_ConvertTempratureToFloat(uchar ubyTempMsb, uchar ubyTempLsb)
@@ -80,7 +90,76 @@ float Thermometer_ConvertTempratureToFloat(uchar ubyTempMsb, uchar ubyTempLsb)
 
 int main()
 {
+    //-0.5
     Thermometer_BcdTemperature temperatureBcdValue;
-    float temp = Thermometer_ConvertTempratureToFloat(0b11111111, 0b11111000);       
-    printf("%f", temp);
+    float temp = Thermometer_ConvertTempratureToFloat(0b11111111, 0b11111000);
+    Thermometer_ConvertTempratureToBcd(0b11111111, 0b11111000, &temperatureBcdValue);
+
+    printf("%f\n", temp);
+
+    if (temperatureBcdValue.bIsNegative)
+        printf("%c", '-');
+        
+    printf("%d", temperatureBcdValue.ubyHundreds);
+    printf("%d", temperatureBcdValue.ubyTens);
+    printf("%d", temperatureBcdValue.ubyUnits);
+    printf("%c", '.');
+    printf("%d", temperatureBcdValue.ubyTenths);
+    printf("%d", temperatureBcdValue.ubyHundredths);
+    printf("%d", temperatureBcdValue.ubyThousandths);
+    printf("%d\n", temperatureBcdValue.ubyTenThousandths);
+
+    //-10.125
+    temp = Thermometer_ConvertTempratureToFloat(0b11111111, 0b01011110);
+    Thermometer_ConvertTempratureToBcd(0b11111111, 0b01011110, &temperatureBcdValue);
+
+    printf("%f\n", temp);
+
+    if (temperatureBcdValue.bIsNegative)
+        printf("%c", '-');
+        
+    printf("%d", temperatureBcdValue.ubyHundreds);
+    printf("%d", temperatureBcdValue.ubyTens);
+    printf("%d", temperatureBcdValue.ubyUnits);
+    printf("%c", '.');
+    printf("%d", temperatureBcdValue.ubyTenths);
+    printf("%d", temperatureBcdValue.ubyHundredths);
+    printf("%d", temperatureBcdValue.ubyThousandths);
+    printf("%d\n", temperatureBcdValue.ubyTenThousandths);
+
+    //-25.0625
+    temp = Thermometer_ConvertTempratureToFloat(0b11111110, 0b01101111);
+    Thermometer_ConvertTempratureToBcd(0b11111110, 0b01101111, &temperatureBcdValue);
+
+    printf("%f\n", temp);
+
+    if (temperatureBcdValue.bIsNegative)
+        printf("%c", '-');
+        
+    printf("%d", temperatureBcdValue.ubyHundreds);
+    printf("%d", temperatureBcdValue.ubyTens);
+    printf("%d", temperatureBcdValue.ubyUnits);
+    printf("%c", '.');
+    printf("%d", temperatureBcdValue.ubyTenths);
+    printf("%d", temperatureBcdValue.ubyHundredths);
+    printf("%d", temperatureBcdValue.ubyThousandths);
+    printf("%d\n", temperatureBcdValue.ubyTenThousandths);
+
+    //-55
+    temp = Thermometer_ConvertTempratureToFloat(0b11111100, 0b10010000);
+    Thermometer_ConvertTempratureToBcd(0b11111100, 0b10010000, &temperatureBcdValue);
+
+    printf("%f\n", temp);
+
+    if (temperatureBcdValue.bIsNegative)
+        printf("%c", '-');
+        
+    printf("%d", temperatureBcdValue.ubyHundreds);
+    printf("%d", temperatureBcdValue.ubyTens);
+    printf("%d", temperatureBcdValue.ubyUnits);
+    printf("%c", '.');
+    printf("%d", temperatureBcdValue.ubyTenths);
+    printf("%d", temperatureBcdValue.ubyHundredths);
+    printf("%d", temperatureBcdValue.ubyThousandths);
+    printf("%d\n", temperatureBcdValue.ubyTenThousandths);
 }
