@@ -9,12 +9,12 @@
 #include "../libs/BinaryUtillities.h"
 
 
-void Init()
+void Matrix_Init()
 {
     TRISC = 0b11110000; // set first 4 as output and second 4 as input.
 }
 
-void CheckColumn(uchar col)
+void Matrix_CheckColumn(uchar col)
 {        
     if (col > 3)
         col = 3;

@@ -10,6 +10,7 @@
 #include "./timing-chip.h"
 #include "./matrix.h"
 #include "../drivers/lcd.h"
+#include "../libs/std.h"
 
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
@@ -19,6 +20,27 @@
 #pragma config LVP = OFF // Low-Voltage (Single-Supply) In-Circuit Serial Programming Enable bit (RB3 is digital I/O, HV on MCLR must be used for programming)
 //end config
 
+void Init()
+{
+    Lcd_Init();
+    Timing_Init();
+    Matrix_Init();    
+}
+
 void main(void) {
+    
+    Init();
+    
+    Lcd_SetDisplayMode(true, false, false);
+    
+    Timing_SetTime(12, 24, 45);
+    
+    while(1)
+    {
+        Lcd_ClearDisplay();
+        Timing_ReadTime();       
+        Lcd_WriteString("Hello World");
+    }
+    
     return;
 }
