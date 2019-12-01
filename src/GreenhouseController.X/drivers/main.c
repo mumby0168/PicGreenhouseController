@@ -37,13 +37,18 @@ void main(void) {
     Timing_SetTime(12, 24, 45);
     
     while(1)
-    {
+    {        
         Lcd_ClearDisplay();
         Timing_ReadTime();       
-        Lcd_WriteNumber(g_clock.hours);
-        Lcd_WriteNumber(g_clock.minutes);
-        Lcd_WriteNumber(g_clock.seconds);        
-        DELAY_MICRO_SECONDS(300);
+        Lcd_WriteNumber(g_rawClock.hoursTens);
+        Lcd_WriteNumber(g_rawClock.hoursDigits);
+        
+        Lcd_WriteNumber(g_rawClock.minutesTens);
+        Lcd_WriteNumber(g_rawClock.minutesDigits);
+        
+        Lcd_WriteNumber(g_rawClock.secondsTens);
+        Lcd_WriteNumber(g_rawClock.secondDigits);                       
+        Lcd_SetDisplayMode(true, false, false);
     }
     
     return;
