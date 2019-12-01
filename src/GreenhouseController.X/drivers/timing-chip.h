@@ -6,7 +6,7 @@
 #ifndef TIMING
 #define TIMING
 
-typedef unsigned char uchar;
+#include "../libs/std.h"
 
 typedef struct
 {

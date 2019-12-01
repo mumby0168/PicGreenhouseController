@@ -6,9 +6,7 @@
 #ifndef MATRIX
 #define MATRIX
 
-typedef unsigned char uchar;
-
-
+#include "../libs/std.h"
 
 typedef struct
 {
@@ -27,8 +25,8 @@ typedef struct
     Keys Column4;
 } KeyMatrix;
 
-void CheckColumn(uchar col);
-void Init(void);
+void Matrix_CheckColumn(uchar col);
+void Matrix_Init(void);
 
 KeyMatrix g_Keys;
 
