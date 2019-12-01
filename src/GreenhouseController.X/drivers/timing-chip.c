@@ -59,25 +59,25 @@ inline void memset(void* const ptr, const unsigned char c, const unsigned int le
 #define ZERO_MEMORY(ptr, type) memset(ptr, 0, sizeof(type))
 
 //Write Operations
-void WriteDate(uchar data);
-void WriteSeconds(uchar seconds);
-void WriteHours(uchar hours);
-void WriteMinutes(uchar minutes);
-void WriteDate(uchar date);
-void WriteMonth(uchar month);
-void WriteDay(uchar day);
-void WriteYear(uchar year);
+static void WriteDate(uchar data);
+static void WriteSeconds(uchar seconds);
+static void WriteHours(uchar hours);
+static void WriteMinutes(uchar minutes);
+static void WriteDate(uchar date);
+static void WriteMonth(uchar month);
+static void WriteDay(uchar day);
+static void WriteYear(uchar year);
 
 
 
 //Read Operations
-void ReadSeconds(void);
-void ReadMinutes(void);
-void ReadHours(void);
-void ReadDate(void);
-void ReadMonth(void);
-void ReadDay(void);
-void ReadYear(void);
+static void ReadSeconds(void);
+static void ReadMinutes(void);
+static void ReadHours(void);
+static void ReadDate(void);
+static void ReadMonth(void);
+static void ReadDay(void);
+static void ReadYear(void);
 
 //Low Level API
 inline void WriteCommandByte(uchar);
@@ -225,7 +225,7 @@ inline uchar AssembleByte()
 
 //Write Operations
 
-void WriteSeconds(uchar seconds)
+static void WriteSeconds(uchar seconds)
 {
     uchar encoded = 0;
     uchar tens = seconds / 10;
@@ -235,7 +235,7 @@ void WriteSeconds(uchar seconds)
     WriteByte(&encoded);
 }
 
-void WriteMinutes(uchar minutes)
+static void WriteMinutes(uchar minutes)
 {
     uchar encoded = 0;
     uchar tens = minutes / 10;
@@ -245,7 +245,7 @@ void WriteMinutes(uchar minutes)
     WriteByte(&encoded);
 }
 
-void WriteHours(uchar hours)
+static void WriteHours(uchar hours)
 {
     uchar encoded = 0;
     uchar tens = hours / 10;    
@@ -265,7 +265,7 @@ void WriteHours(uchar hours)
     WriteByte(&encoded);
 }
 
-void WriteDate(uchar date)
+static void WriteDate(uchar date)
 {
     uchar digits = date % 10;
     uchar tens = date / 10;    
@@ -274,7 +274,7 @@ void WriteDate(uchar date)
     WriteByte(&encoded);    
 }
 
-void WriteMonth(uchar month)
+static void WriteMonth(uchar month)
 {
     uchar digits = month % 10;
     uchar tens = month / 10;    
@@ -283,12 +283,12 @@ void WriteMonth(uchar month)
     WriteByte(&encoded);
 }
 
-void WriteDay(uchar day)
+static void WriteDay(uchar day)
 {
     WriteByte(&day);    
 }
 
-void WriteYear(uchar year)
+static void WriteYear(uchar year)
 {
     uchar digits = year % 10;    
     uchar tens = year / 10;
@@ -300,7 +300,7 @@ void WriteYear(uchar year)
 
 //Read Operations
 
-void ReadSeconds()
+static void ReadSeconds()
 {    
     uchar temp = AssembleByte();
     uchar tens = (temp & 0x70) >> 4;    
@@ -310,7 +310,7 @@ void ReadSeconds()
     g_clock.seconds = (tens * 10) + digits;
 }
 
-void ReadMinutes()
+static void ReadMinutes()
 {    
     uchar temp = AssembleByte();    
     uchar tens = (temp & 0x70) >> 4;
@@ -320,7 +320,7 @@ void ReadMinutes()
     g_clock.minutes = (tens * 10) + digits;
 }
 
-void ReadHours()
+static void ReadHours()
 {
     //TODO: double check assumptions made here based of bit defitions from the datasheet.   
     uchar temp = AssembleByte();    
@@ -340,7 +340,7 @@ void ReadHours()
     g_clock.minutes = (tens * 10) + digits;
 }
 
-void ReadDate()
+static void ReadDate()
 {
     uchar temp = AssembleByte();
     uchar tens = (temp & 0x30) >> 4;
@@ -348,7 +348,7 @@ void ReadDate()
     g_clock.date = (tens * 10) + digits;    
 }
 
-void ReadMonth()
+static void ReadMonth()
 {    
     uchar temp = AssembleByte();  
     uchar digits = (temp & 0x0F);
@@ -356,13 +356,13 @@ void ReadMonth()
     g_clock.month = (tens * 10) + digits;
 }
 
-void ReadDay()
+static void ReadDay()
 {    
     uchar temp = AssembleByte();
     g_clock.day = temp;
 }
 
-void ReadYear()
+static void ReadYear()
 {
     uchar temp = AssembleByte(); 
     uchar tens = (temp & 0xF0) >> 4;

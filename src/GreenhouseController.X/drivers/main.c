@@ -8,6 +8,7 @@
 
 #include <xc.h> 
 #include "./timing-chip.h"
+#include "./matrix.h"
 
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)

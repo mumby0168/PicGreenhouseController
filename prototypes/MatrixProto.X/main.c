@@ -72,9 +72,8 @@ void Init(void);
 
 
 void CheckColumn(uchar col);
-void SetValues(uchar col);
 
-KeyMatrix g_Keys;
+
 
 void Init()
 {
@@ -132,9 +131,7 @@ void WriteKeysToLcd()
     WriteNumber(g_Keys.Column4.one);
     WriteNumber(g_Keys.Column4.two);
     WriteNumber(g_Keys.Column4.three);
-    WriteNumber(g_Keys.Column4.four);
-    
-    
+    WriteNumber(g_Keys.Column4.four);    
 }
 
 
