@@ -7,5 +7,6 @@
 typedef unsigned char uchar;
 typedef uchar bool;
 
+
 #endif	/* XC_HEADER_TEMPLATE_H */
 
