@@ -6,9 +6,7 @@
 #ifndef MATRIX
 #define MATRIX
 
-typedef unsigned char uchar;
-
-
+#include "../libs/std.h"
 
 typedef struct
 {

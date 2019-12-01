@@ -97,6 +97,22 @@ inline void Lcd_SetDisplayMode(const bool bLcdOn, const bool bCursorOn, const bo
     lcd_write_command(0b00001000 | bLcdOn << 2 | bCursorOn << 1 | bBlinkOn);
 }
 
+void Lcd_WriteNumber(char num)
+{
+    if(num > 100)
+    {
+        Lcd_WriteCharacter(126);
+        return;
+    }
+    if(num > 10)
+    {
+        char tens = num / 10;
+        Lcd_WriteCharacter(tens + 48);
+    }
+    char digits = num % 10;
+    Lcd_WriteCharacter(digits + 48);
+}
+
 void Lcd_SetCursorPosition(uchar ubyPos, uchar ubyLine)
 {
     s_ubyLinePos = ubyPos;

@@ -11,6 +11,7 @@
 #include "./matrix.h"
 #include "../drivers/lcd.h"
 #include "../libs/std.h"
+#include "../libs/Delays.h"
 
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
@@ -39,7 +40,10 @@ void main(void) {
     {
         Lcd_ClearDisplay();
         Timing_ReadTime();       
-        Lcd_WriteString("Hello World");
+        Lcd_WriteNumber(g_clock.hours);
+        Lcd_WriteNumber(g_clock.minutes);
+        Lcd_WriteNumber(g_clock.seconds);        
+        DELAY_MICRO_SECONDS(300);
     }
     
     return;
