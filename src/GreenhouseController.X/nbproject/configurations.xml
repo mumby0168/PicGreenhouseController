@@ -17,6 +17,7 @@
         <itemPath>libs/std.h</itemPath>
         <itemPath>libs/Delays.h</itemPath>
       </logicalFolder>
+      <itemPath>fst.h</itemPath>
     </logicalFolder>
     <logicalFolder name="LinkerScript"
                    displayName="Linker Files"
@@ -38,6 +39,7 @@
         <itemPath>libs/Delays.c</itemPath>
       </logicalFolder>
       <itemPath>drivers/main.c</itemPath>
+      <itemPath>fst.c</itemPath>
     </logicalFolder>
     <logicalFolder name="ExternalFiles"
                    displayName="Important Files"
@@ -46,8 +48,7 @@
     </logicalFolder>
   </logicalFolder>
   <sourceRootList>
-    <Elem>drivers</Elem>
-    <Elem>libs</Elem>
+    <Elem>.</Elem>
   </sourceRootList>
   <projectmakefile>Makefile</projectmakefile>
   <confs>

@@ -1,10 +1,20 @@
-#include <xc.h>
+#include <xc.h> 
+//begin config
+#pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
+#pragma config WDTE = OFF//Watchdog Timer Enable bit (WDT enabled)
+#pragma config PWRTE = ON// Power-up Timer Enable bit (PWRT disabled)
+#pragma config BOREN = OFF// Brown-out Reset Enable bit (BOR enabled)
+#pragma config LVP = OFF // Low-Voltage (Single-Supply) In-Circuit Serial Programming Enable bit (RB3 is digital I/O, HV on MCLR must be used for programming)
+//end config
 
-typedef unsigned char uchar;
+#include "matrix.h"
+#include "std.h"
+
+
 #define nullptr 0
 
 
-uchar GetNewState(const uchar ubyFstValue)
+uchar GetState(const uchar ubyFstValue)
 {
     return (ubyFstValue & 0xF0) >> 4;
 }
@@ -31,8 +41,36 @@ STATE/ACTION
 1/2 -> 0x12												
 */
 
+typedef enum fstEvents
+{
+    FST_EVENT_BACK_BUTTON = 0,
+    FST_EVENT_SAVE_BUTTON = 1,
+    FST_EVENT_MENU_1_BUTTON = 2,
+    FST_EVENT_MENU_2_BUTTON = 3,
+    FST_EVENT_MENU_3_BUTTON = 4,
+    FST_EVENT_LEFT_BUTTON = 5,
+    FST_EVENT_RIGHT_BUTTON = 6,
+    FST_EVENT_UP_BUTTON = 7,
+    FST_EVENT_DOWN_BUTTON = 8,
+    FST_EVENT_SETTINGS_BUTTON = 9
+} FstEvents;
 
-uchar g_ubyStates[8][10] =
+typedef enum fstStates
+{
+    FST_STATES_INITIALISE = 0,
+    FST_STATES_MAIN = 1,
+    FST_STATES_SETTINGS = 2,
+    FST_STATES_CLOCK_SETTINGS = 3,
+    FST_STATES_TRIGGER_OPTIONS = 4,
+    FST_STATES_TEMP_ALARM_SET = 5,
+    FST_STATES_TIME_SET = 6,
+    FST_STATES_DATE_SET = 7 
+} FstStates;
+
+FstStates g_fstState = 1;
+
+
+uchar g_ubyFstTable[8][10] =
 {
     { 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }, //0
     { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20 }, //1
@@ -46,9 +84,20 @@ uchar g_ubyStates[8][10] =
 
 typedef void (*ActionDelegate)(void*);
 
-ActionDelegate g_pFstActions[9] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-
-int main()
+void test(void* p)
 {
     
+}
+
+ActionDelegate g_pFstActions[9] = { nullptr, &test, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+
+
+
+void main(void) {
+    
+    Matrix_Init();           
+    while(1)
+    {
+        
+    }
 }

@@ -4,8 +4,6 @@
 #define true 1
 #define false 0
 
-#define nullptr 0
-
 typedef unsigned char uchar;
 typedef uchar bool;
 

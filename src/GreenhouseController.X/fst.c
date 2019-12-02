@@ -1,19 +1,6 @@
-#include "stdlib.h"
-#include "stdio.h"
-
-typedef unsigned char uchar;
-#define nullptr 0
-
-
-uchar GetState(const uchar ubyFstValue)
-{
-    return (ubyFstValue & 0xF0) >> 4;
-}
-
-uchar GetAction(const uchar ubyFstValue)
-{
-    return (ubyFstValue & 0x0F);
-}
+#include "fst.h"
+#include <xc.h>
+#include "drivers/lcd.h"
 
 /*
 STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9			    ACTION
@@ -31,37 +18,7 @@ STATE/ACTION
 "-" MEANS REMAIN IN SAME STATE. So the table below sets it the the current state
 1/2 -> 0x12												
 */
-
-typedef enum fstEvents
-{
-    FST_EVENT_BACK_BUTTON = 0,
-    FST_EVENT_SAVE_BUTTON = 1,
-    FST_EVENT_MENU_1_BUTTON = 2,
-    FST_EVENT_MENU_2_BUTTON = 3,
-    FST_EVENT_MENU_3_BUTTON = 4,
-    FST_EVENT_LEFT_BUTTON = 5,
-    FST_EVENT_RIGHT_BUTTON = 6,
-    FST_EVENT_UP_BUTTON = 7,
-    FST_EVENT_DOWN_BUTTON = 8,
-    FST_EVENT_SETTINGS_BUTTON = 9
-} FstEvents;
-
-typedef enum fstStates
-{
-    FST_STATES_INITIALISE = 0,
-    FST_STATES_MAIN = 1,
-    FST_STATES_SETTINGS = 2,
-    FST_STATES_CLOCK_SETTINGS = 3,
-    FST_STATES_TRIGGER_OPTIONS = 4,
-    FST_STATES_TEMP_ALARM_SET = 5,
-    FST_STATES_TIME_SET = 6,
-    FST_STATES_DATE_SET = 7 
-} FstStates;
-
-FstStates g_fstState = 1;
-
-
-uchar g_ubyFstTable[8][10] =
+static uchar g_ubyFstTable[8][10] =
 {
     { 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }, //0
     { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20 }, //1
@@ -73,26 +30,31 @@ uchar g_ubyFstTable[8][10] =
     { 0x30, 0x10, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70 }  //7
 };
 
-typedef void (*ActionDelegate)(void*);
 
-void test(void* p)
-{
-    printf("Test Action\n");
+void Fst_Init(void) {
+    g_fstState = 1;
 }
 
-ActionDelegate g_pFstActions[9] = { nullptr, &test, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
-
-
-int main()
+uchar Fst_GetState(const uchar ubyFstValue)
 {
-    g_fstState = 2;
-    int in;
-    do
-    {        
-        uchar val = g_ubyFstTable[g_fstState][in];
-
-        if (g_pFstActions[GetAction(val)] != nullptr)
-            g_pFstActions[GetAction(val)](nullptr);
-
-    } while (in != 'q');
+    return (ubyFstValue & 0xF0) >> 4;
 }
+
+uchar Fst_GetAction(const uchar ubyFstValue)
+{
+    return (ubyFstValue & 0x0F);
+}
+
+void Fst_FakeAction(uchar pAction)
+{    
+    uchar val = g_ubyFstTable[g_fstState][pAction];
+    uchar action = Fst_GetAction(val);
+    g_fstState = Fst_GetState(val);
+    
+    Lcd_WriteNumber(g_fstState);
+    Lcd_WriteCharacter(58);      
+    Lcd_WriteNumber(action);
+}
+
+
+
