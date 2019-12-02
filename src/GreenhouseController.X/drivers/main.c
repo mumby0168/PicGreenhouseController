@@ -33,7 +33,7 @@ void Init()
 }
 
 
-#define DEV
+#define DEMO
 
 #ifdef DEV
 
@@ -56,13 +56,7 @@ int main()
     return 0;    
 }
 
-
-
 #endif
-
-
-
-
 
 #ifdef DEMO
 void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
@@ -81,9 +75,7 @@ void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
 } 
 
 void main(void) 
-{   
-    
-    
+{    
     Init();
     
     Lcd_SetDisplayMode(true, false, false);
@@ -92,16 +84,11 @@ void main(void)
     
     Eeprom_Load();
     
-    if (g_Settings.temp == 9)
-    {
-        Lcd_SetCursorPosition(1, 1);
-        Lcd_WriteString("Nine from load...");
-        DelaySeconds(3);
-        Lcd_ClearDisplay();
-    }
-        
+    if (g_Settings.temp > 9)
+        g_Settings.temp = 0;
+    
     Lcd_SetCursorPosition(1, 3);
-    g_Settings.temp = 9;
+    g_Settings.temp = ++g_Settings.temp;
     if (Eeprom_Save() == false)
     {
         Lcd_WriteString("Failed to save the eeprom.");
