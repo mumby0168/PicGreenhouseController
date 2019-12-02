@@ -154,6 +154,7 @@ void main(void)
         Thermometer_ConvertTempratureToBcd(scratchPad.byTempMsb, scratchPad.byTempLsb, &temperatureBcdValue);        
         PrintTemperatureBcdValue(&temperatureBcdValue);
         
+        g_Settings.temp = 0x00;
         Eeprom_Load();
         
         Lcd_SetCursorPosition(1, 3);
