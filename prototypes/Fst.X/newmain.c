@@ -1,5 +1,4 @@
-#include "stdlib.h"
-#include "stdio.h"
+#include <xc.h>
 
 typedef unsigned char uchar;
 #define nullptr 0
@@ -32,34 +31,8 @@ STATE/ACTION
 1/2 -> 0x12												
 */
 
-typedef enum fstEvents
-{
-    FST_EVENT_BACK_BUTTON = 0,
-    FST_EVENT_SAVE_BUTTON,
-    FST_EVENT_MENU_1_BUTTON,
-    FST_EVENT_MENU_2_BUTTON,
-    FST_EVENT_MENU_3_BUTTON,
-    FST_EVENT_LEFT_BUTTON,
-    FST_EVENT_RIGHT_BUTTON,
-    FST_EVENT_UP_BUTTON,
-    FST_EVENT_DOWN_BUTTON,
-    FST_EVENT_SETTINGS_BUTTON
-} FstEvents;
 
-typedef enum fstStates
-{
-    FST_STATES_INITIALISE,
-    FST_STATES_MAIN,
-    FST_STATES_SETTINGS,
-    FST_STATES_CLOCK_SETTINGS,
-    FST_STATES_TRIGGER_OPTIONS,
-    FST_STATES_TEMP_ALARM_SET,
-    FST_STATES_TIME_SET,
-    FST_STATES_DATE_SET 
-} FstStates;
-
-FstStates g_fstState = FST_STATES_INITIALISE;
-uchar g_ubyFstTable[8][10] =
+uchar g_ubyStates[8][10] =
 {
     { 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }, //0
     { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20 }, //1
@@ -75,24 +48,7 @@ typedef void (*ActionDelegate)(void*);
 
 ActionDelegate g_pFstActions[9] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 
-uchar ProcessState(uchar event)
-{
-    return g_ubyFstTable[g_fstState][event];
-}
-
 int main()
 {
-    g_fstState ;
-    char in;
-    do
-    {
-        printf("Enter an event id:");
-        scanf("%c", &in);
-        printf("\nCurrent State: %d\n", g_fstState);
-        uchar newState = ProcessState(in - 48);
-        printf("New State: 0x%x\n", newState & 0xF0 >> 4);
-        printf("Action: 0x%x\n", newState & 0x0F);
-        if (g_pFstActions[newState & 0x0F] != nullptr)
-            g_pFstActions[newState & 0x0F](nullptr);
-    } while (in != 'q');
+    
 }
