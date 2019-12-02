@@ -14,6 +14,7 @@
 #include "../libs/Delays.h"
 #include "Thermometer.h"
 #include "eeprom.h"
+#include "../fst.h"
 
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
@@ -27,9 +28,43 @@ void Init()
 {
     Lcd_Init();
     Timing_Init();
-    Matrix_Init();    
+    Matrix_Init();
+    Fst_Init();
 }
 
+
+#define DEV
+
+#ifdef DEV
+
+int main()
+{
+    Init();
+    Lcd_SetDisplayMode(true, false, false);        
+    
+    while(1)
+    {         
+        Lcd_ClearDisplay();
+        Fst_FakeAction(9);        
+        DelaySeconds(1);
+        Lcd_SetCursorPosition(0, 2);
+        Fst_FakeAction(2);
+        DelaySeconds(1);     
+        g_fstState = 1;
+    }
+    
+    return 0;    
+}
+
+
+
+#endif
+
+
+
+
+
+#ifdef DEMO
 void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
 {
     if (temperatureBcdValue->bIsNegative)
@@ -43,10 +78,12 @@ void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
     Lcd_WriteCharacter(temperatureBcdValue->ubyHundredths + 48);
     Lcd_WriteCharacter(temperatureBcdValue->ubyThousandths + 48);
     Lcd_WriteCharacter(temperatureBcdValue->ubyTenThousandths + 48);
-}
+} 
 
 void main(void) 
 {   
+    
+    
     Init();
     
     Lcd_SetDisplayMode(true, false, false);
@@ -127,3 +164,5 @@ void main(void)
     
     return;
 }
+
+#endif
