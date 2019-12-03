@@ -13,6 +13,7 @@
 #include "../libs/std.h"
 #include "../libs/Delays.h"
 #include "Thermometer.h"
+#include "eeprom.h"
 #include "../fst.h"
 
 //begin config
@@ -32,7 +33,7 @@ void Init()
 }
 
 
-#define DEV
+#define DEMO
 
 #ifdef DEV
 
@@ -50,13 +51,7 @@ int main()
     return 0;    
 }
 
-
-
 #endif
-
-
-
-
 
 #ifdef DEMO
 void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
@@ -75,14 +70,28 @@ void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
 } 
 
 void main(void) 
-{   
-    
-    
+{    
     Init();
     
     Lcd_SetDisplayMode(true, false, false);
     
     Timing_SetTime(12, 24, 45);
+    
+    Eeprom_Load();
+    
+    if (g_Settings.temp > 9)
+        g_Settings.temp = 0;
+    
+    Lcd_SetCursorPosition(1, 3);
+    g_Settings.temp = ++g_Settings.temp;
+    if (Eeprom_Save() == false)
+    {
+        Lcd_WriteString("Failed to save the eeprom.");
+        DelaySeconds(10);
+        return;
+    }
+    
+    g_Settings.temp = 0x00;
     
     while(1)
     {        
@@ -93,12 +102,15 @@ void main(void)
         Lcd_WriteNumber(g_rawClock.hoursTens);
         Lcd_WriteNumber(g_rawClock.hoursDigits);
         
+        Lcd_WriteCharacter(':');
+        
         Lcd_WriteNumber(g_rawClock.minutesTens);
         Lcd_WriteNumber(g_rawClock.minutesDigits);
         
+        Lcd_WriteCharacter(':');
+        
         Lcd_WriteNumber(g_rawClock.secondsTens);
-        Lcd_WriteNumber(g_rawClock.secondDigits);                       
-        Lcd_SetDisplayMode(true, false, false);
+        Lcd_WriteNumber(g_rawClock.secondDigits);
         
         //Therm
         Lcd_SetCursorPosition(1, 2);
@@ -106,6 +118,7 @@ void main(void)
         if (Thermometer_ProcessTemperature() != 0)
         {
             Lcd_WriteString("Failed to process temperature.");
+            DelayMilliSeconds(200);
             continue;
         }
         
@@ -115,12 +128,19 @@ void main(void)
         if (Thermometer_ReadScratchPad(&scratchPad, 2) != 0)
         {
             Lcd_WriteString("Failed to read scratch pad.");
+            DelayMilliSeconds(200);
             continue;
         }
         
         Thermometer_BcdTemperature temperatureBcdValue;
         Thermometer_ConvertTempratureToBcd(scratchPad.byTempMsb, scratchPad.byTempLsb, &temperatureBcdValue);        
         PrintTemperatureBcdValue(&temperatureBcdValue);
+        
+        g_Settings.temp = 0x00;
+        Eeprom_Load();
+        
+        Lcd_SetCursorPosition(1, 3);
+        Lcd_WriteCharacter(g_Settings.temp + 48);
         
         DelayMilliSeconds(200);
     }
