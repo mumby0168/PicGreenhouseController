@@ -30,7 +30,7 @@ ushort g_keyState;
 void Matrix_CheckColumnState(uchar col);
 void Matrix_Init(void);
 uchar Matrix_GetColumn(uchar col);
-bool Matrix_CheckRow(uchar columnState, uchar button);
+bool Matrix_IsButtonPressed(uchar columnState, uchar button);
 
 
 // KeyMatrix g_Keys;
