@@ -44,12 +44,7 @@ int main()
     while(1)
     {         
         Lcd_ClearDisplay();
-        Fst_FakeAction(9);        
-        DelaySeconds(1);
-        Lcd_SetCursorPosition(0, 2);
-        Fst_FakeAction(2);
-        DelaySeconds(1);     
-        g_fstState = 1;
+        Fst_Update();
     }
     
     return 0;    

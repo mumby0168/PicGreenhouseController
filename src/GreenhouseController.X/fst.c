@@ -1,6 +1,7 @@
 #include "fst.h"
 #include <xc.h>
 #include "drivers/lcd.h"
+#include "drivers/matrix.h"
 
 /*
 STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9			    ACTION
@@ -45,6 +46,35 @@ uchar Fst_GetAction(const uchar ubyFstValue)
     return (ubyFstValue & 0x0F);
 }
 
+
+void Fst_Update(void)
+{
+    int i = 0;
+    
+    g_keyState = 0;
+    
+    Matrix_CheckColumnState(0);
+    Matrix_CheckColumnState(1);
+    Matrix_CheckColumnState(2);
+    Matrix_CheckColumnState(3);
+
+    uchar col1State = Matrix_GetColumn(0);
+    uchar col2State = Matrix_GetColumn(1);
+    uchar col3State = Matrix_GetColumn(2);
+    uchar col4State = Matrix_GetColumn(3);
+
+    Lcd_SetCursorPosition(0, 1);
+    Lcd_WriteNumber(col1State);
+    Lcd_SetCursorPosition(0, 2);
+    Lcd_WriteNumber(col2State);
+    Lcd_SetCursorPosition(0, 3);
+    Lcd_WriteNumber(col3State);
+    Lcd_SetCursorPosition(0, 4);
+    Lcd_WriteNumber(col4State);            
+}
+
+
+/*
 void Fst_FakeAction(uchar pAction)
 {    
     uchar val = g_ubyFstTable[g_fstState][pAction];
@@ -55,6 +85,7 @@ void Fst_FakeAction(uchar pAction)
     Lcd_WriteCharacter(58);      
     Lcd_WriteNumber(action);
 }
+*/
 
 
 

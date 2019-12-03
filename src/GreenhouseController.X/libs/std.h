@@ -8,6 +8,7 @@
 
 typedef unsigned char uchar;
 typedef uchar bool;
+typedef unsigned short ushort;
 
 #endif	/* XC_HEADER_TEMPLATE_H */
 

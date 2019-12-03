@@ -8,26 +8,31 @@
 
 #include "../libs/std.h"
 
-typedef struct
-{
-    uchar one : 1;
-    uchar two : 1;
-    uchar three : 1;
-    uchar four: 1;
-    uchar res: 4;
-} Keys;
+// typedef struct
+// {
+//     uchar one : 1;
+//     uchar two : 1;
+//     uchar three : 1;
+//     uchar four: 1;
+//     uchar res: 4;
+// } Keys;
 
-typedef struct
-{
-    Keys Column1;
-    Keys Column2;
-    Keys Column3;
-    Keys Column4;
-} KeyMatrix;
+// typedef struct
+// {
+//     Keys Column1;
+//     Keys Column2;
+//     Keys Column3;
+//     Keys Column4;
+// } KeyMatrix;
 
-void Matrix_CheckColumn(uchar col);
+ushort g_keyState;
+
+void Matrix_CheckColumnState(uchar col);
 void Matrix_Init(void);
+uchar Matrix_GetColumn(uchar col);
+bool Matrix_CheckRow(uchar columnState, uchar button);
 
-KeyMatrix g_Keys;
+
+// KeyMatrix g_Keys;
 
 #endif
