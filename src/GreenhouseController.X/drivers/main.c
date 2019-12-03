@@ -41,7 +41,7 @@ int main()
 {
     Init();
     Lcd_SetDisplayMode(true, false, false);        
-    
+    Lcd_WriteString("Start");
     while(1)
     {         
         Lcd_ClearDisplay();

@@ -83,9 +83,7 @@ inline void WriteCurrentState()
 
 
 void Fst_Update(void)
-{
-    int i = 0;
-    
+{    
     g_keyState = 0;
     
     Matrix_CheckColumnState(0);
@@ -119,7 +117,6 @@ void Fst_Update(void)
     else if(Matrix_IsButtonPressed(col1State, 3) == 1) // SAVE
         Execute(1);     
     
-    
     WriteCurrentState();
 }
 
@@ -131,6 +128,8 @@ inline void Execute(uchar pAction)
     uchar val = g_ubyFstTable[g_fstState][pAction];
     uchar action = Fst_GetAction(val);
     g_fstState = Fst_GetState(val);
+    Lcd_SetCursorPosition(12, 4);
+    Lcd_WriteNumber(pAction);
     // Get and execute action fPointer    
 }
 
