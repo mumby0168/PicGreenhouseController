@@ -7,6 +7,9 @@
 #include "drivers/timing-chip.h"
 #include "displays/settings_display.h"
 #include "displays/trigger-opts.h"
+#include "displays/time_set.h"
+#include "displays/date_set.h"
+#include "displays/temp_set.h"
 
 /*
 STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9			    ACTION
