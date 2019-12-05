@@ -105,7 +105,7 @@ void __interrupt() thermometer_interrupt(void)
         if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
         {
             T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
-            g_ProcessTemperatureComplete = true;
+            Thermometer_bProcessTemperatureComplete = true;
             s_ubyInterruptTriggerCount = 0;
         }
         
@@ -114,9 +114,9 @@ void __interrupt() thermometer_interrupt(void)
     }
 }
 
-void Thermometer_Initialise()
+void Thermometer_Init()
 {
-    g_ProcessTemperatureComplete = false;
+    Thermometer_bProcessTemperatureComplete = false;
     INTCONbits.GIE = 0;
     INTCONbits.PEIE = 1;
     PIR1bits.TMR2IF = 0; //clear the flag
@@ -212,7 +212,7 @@ uchar Thermometer_ProcessTemperature(void)
     
     thermometer_write_byte(0x44);
 
-    g_ProcessTemperatureComplete = false;
+    Thermometer_bProcessTemperatureComplete = false;
     T2CONbits.TMR2ON = 1;
     return 0;
 }

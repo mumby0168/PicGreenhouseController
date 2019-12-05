@@ -1,7 +1,6 @@
-#ifndef MAIN_DISPLAY
-#define MAIN_DISPLAY
+#ifndef MAIN_DISPLAY_H
+#define MAIN_DISPLAY_H
 
-void Main_Init(void);
-void Main_Update(void);
+void Main_Display(void);
 
 #endif

@@ -3,7 +3,7 @@
 #include "display-std.h"
 
 
-void Time_Set_Update(void)
+void Time_Set_Display(void)
 {
     Lcd_SetCursorPosition(5, 2);
     Lcd_WriteString("TIME SET");

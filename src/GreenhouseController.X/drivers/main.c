@@ -41,32 +41,26 @@ void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
     Lcd_WriteCharacter(temperatureBcdValue->ubyTenThousandths + 48);
 } 
 
-void action_1()
-{
-    Lcd_SetCursorPosition(1, 4);
-    Lcd_WriteString("Action One");
-    DelaySeconds(1);
-}
-
 void main(void) 
 {   
-    Lcd_Init();
+    Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
     Fst_Init();
-    
-    Fst_SetAction(1, &action_1);
-    
+    Thermometer_Init();
+    Thermometer_ProcessTemperature();
+
     DelaySeconds(1);
     
     Fst_ProcessEvent(FST_EVENT_INITIALISED);
     
     while(1)
     {       
-        Fst_Update();
-        NOP();
-        NOP();
-        NOP();
-        NOP();
-        NOP();
+        Fst_States newState = Fst_Update();
+        Fst_ProcessEvent(newState);
+        if (Thermometer_bProcessTemperatureComplete)
+        {
+            Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
+            Thermometer_ProcessTemperature();
+        }
     };
     
     return;

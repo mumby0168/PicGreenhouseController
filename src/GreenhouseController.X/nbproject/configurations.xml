@@ -9,7 +9,10 @@
         <itemPath>displays/main_display.h</itemPath>
         <itemPath>displays/settings_display.h</itemPath>
         <itemPath>displays/clock_settings.h</itemPath>
-        <itemPath>displays/trigger-opts.h</itemPath>
+        <itemPath>displays/trigger_options.h</itemPath>
+        <itemPath>displays/temp_set.h</itemPath>
+        <itemPath>displays/date_set.h</itemPath>
+        <itemPath>displays/time_set.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Drivers" projectFiles="true">
         <itemPath>drivers/eeprom.h</itemPath>
@@ -36,8 +39,11 @@
       <logicalFolder name="f3" displayName="Display" projectFiles="true">
         <itemPath>displays/main_display.c</itemPath>
         <itemPath>displays/settings_dsiplay.c</itemPath>
-        <itemPath>displays/trigger-opts.c</itemPath>
         <itemPath>displays/clock_settings.c</itemPath>
+        <itemPath>displays/trigger_options.c</itemPath>
+        <itemPath>displays/temp_set.c</itemPath>
+        <itemPath>displays/date_set.c</itemPath>
+        <itemPath>displays/time_set.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Drivers" projectFiles="true">
         <itemPath>drivers/eeprom.c</itemPath>

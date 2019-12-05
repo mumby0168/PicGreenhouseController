@@ -1,5 +1,5 @@
 #include <xc.h>
-#include "Lcd.h"
+#include "lcd.h"
 
 #define Enable RA3
 #define ReadWrite RA4
@@ -42,11 +42,6 @@ static void lcd_write_character(const char c)
     Enable = 1;
 }
 
-inline static void lcd_select_basic_functionality()
-{
-    lcd_write_command(0b00110000);
-}
-
 inline static void lcd_set_ddram_address(const uchar pos)
 {
     lcd_write_command(0b10000000 | pos);
@@ -87,7 +82,7 @@ void Lcd_Init(void)
     
     LCD_BUS_MODE = LCD_BUS_MODE_PARALLEL;
     
-    lcd_select_basic_functionality();
+    lcd_write_command(0b00110000); //select the basic functionality
     Lcd_SetDisplayMode(true, false, false);
     Lcd_ClearDisplay();
 }

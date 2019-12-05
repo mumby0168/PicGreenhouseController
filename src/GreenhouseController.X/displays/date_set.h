@@ -2,6 +2,6 @@
 #define DATE_SET
 
 
-void Date_Set_Update(void);
+void Date_Set_Display(void);
 
 #endif

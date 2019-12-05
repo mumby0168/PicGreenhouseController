@@ -3,10 +3,7 @@
 
 #include "../libs/std.h"
 
-bool g_IsHot = false;
-bool g_IsDay = false;
-
-
-void Temp_Set_Update(void);
+void Temp_Set_Display(void);
+void Temp_Set_Display_Init(void);
 
 #endif

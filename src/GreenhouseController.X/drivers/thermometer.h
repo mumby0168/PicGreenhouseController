@@ -33,11 +33,9 @@ typedef struct _thermometer_bcdTemperature
     uchar ubyTenThousandths;
 } Thermometer_BcdTemperature;
 
-typedef void (*Thermometer_TemperatureProcessingCompleteDelegate)();
+volatile bool Thermometer_bProcessTemperatureComplete;
 
-volatile bool g_ProcessTemperatureComplete;
-
-void Thermometer_Initialise();
+void Thermometer_Init();
 uchar Thermometer_ProcessTemperature(void);
 uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig);
 uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBytesToRead);

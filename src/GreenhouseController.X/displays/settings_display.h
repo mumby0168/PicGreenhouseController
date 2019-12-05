@@ -1,7 +1,6 @@
-#ifndef SETTINGS_DISPLAY
-#define SETTINGS_DISPLAY
+#ifndef SETTINGS_DISPLAY_H
+#define SETTINGS_DISPLAY_H
 
-void Settings_Init(void);
-void Settings_Update(void);
+void Settings_Display(void);
 
 #endif
