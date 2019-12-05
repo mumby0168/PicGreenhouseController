@@ -9,6 +9,5 @@ void DelayMicroSeconds(uchar x, uchar y);
 void DelayMilliSeconds(unsigned int uiDelay);
 void DelaySeconds(unsigned int uiDelay);
 
-
 #endif
 

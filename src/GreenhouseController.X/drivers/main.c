@@ -12,7 +12,7 @@
 #include "../drivers/lcd.h"
 #include "../libs/std.h"
 #include "../libs/Delays.h"
-#include "Thermometer.h"
+#include "thermometer.h"
 #include "eeprom.h"
 #include "../fst.h"
 
@@ -30,10 +30,41 @@ void Init()
     Timing_Init();
     Matrix_Init();
     Fst_Init();
+    Thermometer_Initialise();
 }
 
 
 #define DEMO
+
+#ifdef INT_DEV
+
+int main()
+{
+    Lcd_Init();
+    Lcd_SetDisplayMode(true, false, false); 
+    Thermometer_Initialise();
+    
+    Lcd_WriteString("Start");
+    
+    char i = 0;
+    Thermometer_ProcessTemperature();
+    while (true)
+    {
+        if (g_ProcessTemperatureComplete)
+        {
+            Lcd_SetCursorPosition(1, 4);
+            Lcd_ClearDisplay();
+            Lcd_WriteCharacter(i + 48);
+            i++;
+            if (i > 9)
+                i = 0;
+            Lcd_WriteString("Temp");
+            Thermometer_ProcessTemperature();
+        }
+    }
+}
+
+#endif
 
 #ifdef DEV
 
@@ -98,6 +129,7 @@ void main(void)
     
     g_Settings.temp = 0x00;
     
+    char i = 0;
     while(1)
     {        
         Lcd_ClearDisplay();
@@ -148,6 +180,18 @@ void main(void)
         Lcd_WriteCharacter(g_Settings.temp + 48);
         
         DelayMilliSeconds(200);
+        
+        if (g_ProcessTemperatureComplete)
+        {
+            Lcd_SetCursorPosition(1, 4);
+            Lcd_ClearDisplay();
+            Lcd_WriteCharacter(i + 48);
+            i++;
+            if (i > 9)
+                i = 0;
+            Lcd_WriteString("Temp");
+            //Thermometer_ProcessTemperature();
+        }
     }
     
     return;
