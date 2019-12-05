@@ -10,7 +10,7 @@ typedef struct _thermometer_userConfig
     uchar byConfig;   
 } Thermometer_UserConfig;
 
-typedef struct _scratchPad
+typedef struct _thermometer_scratchPad
 {
     uchar byTempLsb;
     uchar byTempMsb;
@@ -33,6 +33,11 @@ typedef struct _thermometer_bcdTemperature
     uchar ubyTenThousandths;
 } Thermometer_BcdTemperature;
 
+typedef void (*Thermometer_TemperatureProcessingCompleteDelegate)();
+
+volatile bool g_ProcessTemperatureComplete;
+
+void Thermometer_Initialise();
 uchar Thermometer_ProcessTemperature(void);
 uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig);
 uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBytesToRead);

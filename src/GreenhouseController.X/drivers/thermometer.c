@@ -1,7 +1,11 @@
 #include <xc.h>
-#include "Thermometer.h"
+#include "thermometer.h"
 #include "../libs/BinaryUtillities.h"
 #include "../libs/Delays.h"
+#include "lcd.h"
+
+#define TMR2_VAL 11
+#define TMR2_TRIGGER_COUNT 12
 
 static void thermometer_write_byte(uchar val)
 {
@@ -92,6 +96,59 @@ static uchar thermometer_reset(void)
     return 0;
 }
 
+static uchar s_ubyInterruptTriggerCount = 0;
+void __interrupt() thermometer_interrupt(void)
+{
+    if (PIR1bits.TMR2IF == 1)
+    {
+        s_ubyInterruptTriggerCount++;
+        if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
+        {
+            T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
+            g_ProcessTemperatureComplete = true;
+            s_ubyInterruptTriggerCount = 0;
+        }
+        
+        TMR2 = TMR2_VAL;
+        PIR1bits.TMR2IF = 0;
+    }
+}
+
+void Thermometer_Initialise()
+{
+    g_ProcessTemperatureComplete = false;
+    INTCONbits.GIE = 0;
+    INTCONbits.PEIE = 1;
+    PIR1bits.TMR2IF = 0; //clear the flag
+    PIE1bits.TMR2IE = 1; //enable timer 2  
+    /*
+        bit 7 Unimplemented: Read as 0
+        bit 6-3 TOUTPS3:TOUTPS0: Timer2 Output Postscale Select bits
+        0000 = 1:1 postscale
+        0001 = 1:2 postscale
+        0010 = 1:3 postscale
+        ?
+        ?
+        ?
+        1111 = 1:16 postscale
+        bit 2 TMR2ON: Timer2 On bit
+        1 = Timer2 is on
+        0 = Timer2 is off
+        bit 1-0 T2CKPS1:T2CKPS0: Timer2 Clock Prescale Select bits
+        00 = Prescaler is 1
+        01 = Prescaler is 4
+        1x = Prescaler is 16
+        ----------------------------------------------
+        fclk	pre	post	count	fout	      tout = (4*pre*(PR2-TRM2)*POST*count)/fclk
+        4000000	16	16	    12	    1.334101776	  0.749568
+        PR2	TRM2	`			
+        255	11
+     */
+    T2CON = 0b01111011; //configure timer 2 as above
+    PR2 = 0xFF; //set the trigger value.
+    TMR2 = TMR2_VAL;
+}
+
 uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig)
 {
     uchar byStatus = 0;
@@ -154,8 +211,9 @@ uchar Thermometer_ProcessTemperature(void)
         return byStatus;
     
     thermometer_write_byte(0x44);
-    
-    DelayMilliSeconds(750);
+
+    g_ProcessTemperatureComplete = false;
+    T2CONbits.TMR2ON = 1;
     return 0;
 }
 

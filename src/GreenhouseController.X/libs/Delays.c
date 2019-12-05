@@ -17,6 +17,7 @@ typedef enum _tmr0PreScalerValues
 
 static void enable_timer_zero_interrupt()
 {
+    INTCONbits.GIE = 0;
     SetBitLow(&INTCON, 2); //Clear the TMR0 overflow bit
     SetBitHigh(&INTCON, 5); //Enable TMR0 interrupt    
 }
@@ -31,6 +32,7 @@ static void configure_timer_zero_interrupt(TimerZeroPreScalerValues byPreScaler)
 inline static void disable_timer_zero_interrupt()
 {
     SetBitLow(&INTCON, 5); //Disable TMR0 interrupt
+    INTCONbits.GIE = 1;
 }
 
 void DelayMicroSeconds(uchar x, uchar y)
