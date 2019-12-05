@@ -128,7 +128,7 @@ void Lcd_SetCursorPosition(uchar ubyPos, uchar ubyLine)
         ubyLine = 1;
     
     if (ubyLine > 4)
-        ubyLine = 16;
+        ubyLine = 4;
     
     ubyPos -= 1;
     uchar ubyDdramAddress = ubyPos / 2;

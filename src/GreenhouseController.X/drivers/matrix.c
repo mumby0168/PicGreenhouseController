@@ -34,8 +34,7 @@ uchar Matrix_GetColumn(uchar col)
 
 bool Matrix_IsButtonPressed(uchar columnState, uchar button)
 {
-    if(button > 3) return false;
-    bool isSet = (columnState & (1U << button));
+    bool isSet = columnState & (1 << button);
     return isSet;    
 }
 

@@ -36,7 +36,7 @@ void Init()
 }
 
 
-#define DEMO
+#define DEV
 
 #ifdef INT_DEV
 
