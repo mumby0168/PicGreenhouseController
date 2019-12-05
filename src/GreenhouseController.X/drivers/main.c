@@ -39,7 +39,7 @@ void Init()
 
 int main()
 {
-    Init();
+    Init();    
     Lcd_SetDisplayMode(true, false, false);        
     Lcd_WriteString("Start");
     while(1)

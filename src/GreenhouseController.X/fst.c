@@ -2,6 +2,11 @@
 #include <xc.h>
 #include "drivers/lcd.h"
 #include "drivers/matrix.h"
+#include "displays/main_display.h"
+#include "displays/settings_display.h"
+#include "drivers/timing-chip.h"
+#include "displays/settings_display.h"
+#include "displays/trigger-opts.h"
 
 /*
 STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9			    ACTION
@@ -16,9 +21,10 @@ EVENT		        BACK	SAVE	MENU1	MENU2	MENU3	LEFT	RIGHT	UP	DOWN	SETTINGS		0	DO NOT
 7	DATE SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		        8	DECREMENT DIGIT
 														
 STATE/ACTION													
-"-" MEANS REMAIN IN SAME STATE. So the table below sets it the the current state
+- MEANS REMAIN IN SAME STATE. So the table below sets it the the current state
 1/2 -> 0x12												
-*/
+**/
+
 static uchar g_ubyFstTable[8][10] =
 {
     { 0x00, 0x00, 0x00, 0x00, 0x20, 0x00, 0x00, 0x00, 0x00, 0x00 }, //0
@@ -36,6 +42,8 @@ inline void Execute(uchar pAction);
 
 void Fst_Init(void) {
     g_fstState = 1;
+    Main_Init();
+    Timing_SetCalendar(4, 10, 10, 19);
 }
 
 uchar Fst_GetState(const uchar ubyFstValue)
@@ -80,10 +88,11 @@ inline void WriteCurrentState()
     
 }
 
-
+//#define KEYS
 
 void Fst_Update(void)
 {    
+    #ifdef KEYS
     g_keyState = 0;
     
     Matrix_CheckColumnState(0);
@@ -115,9 +124,11 @@ void Fst_Update(void)
     else if(Matrix_IsButtonPressed(col1State, 2) == 1) // RIGHT
         Execute(6);
     else if(Matrix_IsButtonPressed(col1State, 3) == 1) // SAVE
-        Execute(1);     
+        Execute(1);   
+#endif
     
-    WriteCurrentState();
+    //WriteCurrentState();
+    Main_Update();
 }
 
 

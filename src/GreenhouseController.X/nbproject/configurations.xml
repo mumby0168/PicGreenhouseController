@@ -8,6 +8,8 @@
         <itemPath>displays/display-std.h</itemPath>
         <itemPath>displays/main_display.h</itemPath>
         <itemPath>displays/settings_display.h</itemPath>
+        <itemPath>displays/clock_settings.h</itemPath>
+        <itemPath>displays/trigger-opts.h</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Drivers" projectFiles="true">
         <itemPath>drivers/eeprom.h</itemPath>
@@ -34,6 +36,8 @@
       <logicalFolder name="f3" displayName="Display" projectFiles="true">
         <itemPath>displays/main_display.c</itemPath>
         <itemPath>displays/settings_dsiplay.c</itemPath>
+        <itemPath>displays/trigger-opts.c</itemPath>
+        <itemPath>displays/clock_settings.c</itemPath>
       </logicalFolder>
       <logicalFolder name="f1" displayName="Drivers" projectFiles="true">
         <itemPath>drivers/eeprom.c</itemPath>

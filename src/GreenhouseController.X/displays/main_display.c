@@ -30,22 +30,23 @@ static inline void Prepare(void)
 }
 
 static inline void Draw(void)
-{
+{    
     //TIME
     Lcd_SetCursorPosition(0, 0);
     Lcd_WriteNumber(g_rawClock.hoursTens);
     Lcd_WriteNumber(g_rawClock.hoursDigits);
     Lcd_WriteCharacter(58); // :
-    Lcd_WriteNumber(g_rawClock.secondsTens);
-    Lcd_WriteNumber(g_rawClock.secondDigits);
+    Lcd_WriteNumber(g_rawClock.minutesTens);
+    Lcd_WriteNumber(g_rawClock.minutesDigits);
 
     // DAY & DATE
     Lcd_SetCursorPosition(11, 0);
     Lcd_WriteString(days[g_clock.day]);
-    Lcd_WriteCharacter('/0');
+    Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.date);
 
     // DRAW TEMP
+    
     /*
 
     TEMP CODE HERE
@@ -55,7 +56,7 @@ static inline void Draw(void)
     // MONTH & YEAR
     Lcd_SetCursorPosition(11, 4);
     Lcd_WriteString(months[g_clock.month]);
-    Lcd_WriteCharacter('/0');
+    Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.year);
 }
 
