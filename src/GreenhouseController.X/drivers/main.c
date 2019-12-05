@@ -5,7 +5,6 @@
  * Created on 23 November 2019, 13:21
  */
 
-
 #include <xc.h> 
 #include "./timing-chip.h"
 #include "./matrix.h"
