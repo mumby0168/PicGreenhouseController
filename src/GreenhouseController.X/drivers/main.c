@@ -26,6 +26,8 @@
 
 void Init()
 {
+    INTCONbits.RBIE = 0;
+    
     Lcd_Init();
     Timing_Init();
     Matrix_Init();
@@ -34,7 +36,7 @@ void Init()
 }
 
 
-#define DEV
+#define DEMO
 
 #ifdef INT_DEV
 
@@ -113,7 +115,7 @@ void main(void)
     if (g_Settings.temp > 9)
         g_Settings.temp = 0;
     
-    Lcd_SetCursorPosition(1, 3);
+    Lcd_SetCursorPosition(1, 2);
     g_Settings.temp = ++g_Settings.temp;
     if (Eeprom_Save() == false)
     {
@@ -124,6 +126,7 @@ void main(void)
     
     g_Settings.temp = 0x00;
     
+    Thermometer_ProcessTemperature();
     char i = 0;
     while(1)
     {        
@@ -144,48 +147,28 @@ void main(void)
         Lcd_WriteNumber(g_rawClock.secondsTens);
         Lcd_WriteNumber(g_rawClock.secondDigits);
         
-        //Therm
-        Lcd_SetCursorPosition(1, 2);
-        
-        if (Thermometer_ProcessTemperature() != 0)
-        {
-            Lcd_WriteString("Failed to process temperature.");
-            DelayMilliSeconds(200);
-            continue;
-        }
-        
-        DelayMilliSeconds(750);
-
-        Thermometer_ScratchPad scratchPad;
-        if (Thermometer_ReadScratchPad(&scratchPad, 2) != 0)
-        {
-            Lcd_WriteString("Failed to read scratch pad.");
-            DelayMilliSeconds(200);
-            continue;
-        }
-        
-        Thermometer_BcdTemperature temperatureBcdValue;
-        Thermometer_ConvertTempratureToBcd(scratchPad.byTempMsb, scratchPad.byTempLsb, &temperatureBcdValue);        
-        PrintTemperatureBcdValue(&temperatureBcdValue);
-        
         g_Settings.temp = 0x00;
         Eeprom_Load();
-        
-        Lcd_SetCursorPosition(1, 3);
+        Lcd_SetCursorPosition(1, 2);
         Lcd_WriteCharacter(g_Settings.temp + 48);
         
         DelayMilliSeconds(200);
         
         if (g_ProcessTemperatureComplete)
         {
-            Lcd_SetCursorPosition(1, 4);
-            Lcd_ClearDisplay();
-            Lcd_WriteCharacter(i + 48);
+            Thermometer_ScratchPad sp;
+            Thermometer_ReadScratchPad(&sp, 2);
+            Thermometer_BcdTemperature bcdTemp;
+            Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &bcdTemp);
+            
+            Lcd_SetCursorPosition(1, 3);
+            PrintTemperatureBcdValue(&bcdTemp);
+            
             i++;
             if (i > 9)
                 i = 0;
-            Lcd_WriteString("Temp");
-            //Thermometer_ProcessTemperature();
+
+            Thermometer_ProcessTemperature();
         }
     }
     

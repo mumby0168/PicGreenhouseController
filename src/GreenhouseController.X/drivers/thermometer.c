@@ -96,10 +96,28 @@ static uchar thermometer_reset(void)
     return 0;
 }
 
+static uchar s_ubyInterruptTriggerCount = 0;
+void __interrupt() thermometer_interrupt(void)
+{
+    if (PIR1bits.TMR2IF == 1)
+    {
+        s_ubyInterruptTriggerCount++;
+        if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
+        {
+            T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
+            g_ProcessTemperatureComplete = true;
+            s_ubyInterruptTriggerCount = 0;
+        }
+        
+        TMR2 = TMR2_VAL;
+        PIR1bits.TMR2IF = 0;
+    }
+}
+
 void Thermometer_Initialise()
 {
     g_ProcessTemperatureComplete = false;
-    INTCONbits.GIE = 1;
+    INTCONbits.GIE = 0;
     INTCONbits.PEIE = 1;
     PIR1bits.TMR2IF = 0; //clear the flag
     PIE1bits.TMR2IE = 1; //enable timer 2  
@@ -129,25 +147,6 @@ void Thermometer_Initialise()
     T2CON = 0b01111011; //configure timer 2 as above
     PR2 = 0xFF; //set the trigger value.
     TMR2 = TMR2_VAL;
-}
-
-static uchar s_ubyInterruptTriggerCount = 0;
-void __interrupt() thermometer_interrupt(void)
-{
-    if (PIR1bits.TMR2IF == 1)
-    {
-        s_ubyInterruptTriggerCount++;
-        if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
-        {
-            T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
-            Lcd_WriteCharacter('1');
-            g_ProcessTemperatureComplete = true;
-            s_ubyInterruptTriggerCount = 0;
-        }
-        
-        TMR2 = TMR2_VAL;
-        PIR1bits.TMR2IF = 0;
-    }
 }
 
 uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig)

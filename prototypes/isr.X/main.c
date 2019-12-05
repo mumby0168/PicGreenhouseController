@@ -18,7 +18,7 @@ volatile uchar draw = 0;
 
 void __interrupt() timer_isr()
 {  
-    if(TMR2IF==1)
+    if (TMR2IF==1)
     {
         TMR2 = TMR2_VALUE;     /*Load the timer Value, (Note: Timervalue is 101 instead of 100 as the
                           Timer2 needs two instruction Cycles to start incrementing TMR2 */
