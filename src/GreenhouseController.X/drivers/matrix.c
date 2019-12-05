@@ -3,11 +3,9 @@
  * PURPOSE: provide the api available for the timing chip
  * AUTHOR: B.Mumby
 ***********************************************************************/
-
-#include "matrix.h"
 #include <xc.h>
+#include "matrix.h"
 #include "../libs/BinaryUtillities.h"
-
 
 void Matrix_Init()
 {
@@ -22,15 +20,14 @@ void Matrix_CheckColumnState(uchar col)
     PORTC = 0x00;
     SetBitHigh(&PORTC, 3 - col);
     ushort nibble = GetHighNibble(&PORTC);          
-    g_keyState |= (nibble << (col * 4));
+    Matrix_usKeyState |= (nibble << (col * 4));
 }
 
 uchar Matrix_GetColumn(uchar col)
 {
-    uchar keySection = (g_keyState >> (col * 4)) & 0x0F;
+    uchar keySection = (Matrix_usKeyState >> (col * 4)) & 0x0F;
     return keySection;
 }
-
 
 bool Matrix_IsButtonPressed(uchar columnState, uchar button)
 {
