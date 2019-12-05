@@ -167,7 +167,7 @@ void main(void)
             i++;
             if (i > 9)
                 i = 0;
-
+ 
             Thermometer_ProcessTemperature();
         }
     }
