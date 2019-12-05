@@ -36,7 +36,7 @@ void Init()
 }
 
 
-#define DEMO
+#define DEV
 
 #ifdef INT_DEV
 
@@ -72,7 +72,7 @@ int main()
 
 int main()
 {
-    Init();
+    Init();    
     Lcd_SetDisplayMode(true, false, false);        
     Lcd_WriteString("Start");
     while(1)
