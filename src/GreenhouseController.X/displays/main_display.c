@@ -9,13 +9,13 @@ static inline void Draw(void);
 char* days[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 char* months[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
 
-void Init(void)
+void Main_Init(void)
 {
     Timing_Init();
 }
 
 
-void Update(void)
+void Main_Update(void)
 {
     Prepare();
     Draw();

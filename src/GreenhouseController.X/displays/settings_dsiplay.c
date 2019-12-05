@@ -6,13 +6,13 @@
 static inline void Prepare(void);
 static inline void Draw(void);
 
-void Init(void)
+void Settings_Init(void)
 {
 
 }
 
 
-void Update(void)
+void Settings_Update(void)
 {
     Prepare();
     Draw();

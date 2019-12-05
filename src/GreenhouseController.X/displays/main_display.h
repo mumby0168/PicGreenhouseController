@@ -1,7 +1,7 @@
 #ifndef MAIN_DISPLAY
 #define MAIN_DISPLAY
 
-void Init(void);
-void Update(void);
+void Main_Init(void);
+void Main_Update(void);
 
 #endif
