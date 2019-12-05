@@ -14,7 +14,8 @@ void Init(void)
 
 void Update(void)
 {
-
+    Prepare();
+    Draw();
 }
 
 
