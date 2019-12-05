@@ -40,4 +40,6 @@ uchar Fst_GetAction(const uchar ubyFstValue);
 
 void Fst_FakeAction(uchar action);
 
+void Fst_Update(void);
+
 #endif

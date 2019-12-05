@@ -14,14 +14,30 @@ void Matrix_Init()
     TRISC = 0b11110000; // set first 4 as output and second 4 as input.
 }
 
-void Matrix_CheckColumn(uchar col)
+void Matrix_CheckColumnState(uchar col)
 {        
     if (col > 3)
         col = 3;
     
     PORTC = 0x00;
     SetBitHigh(&PORTC, 3 - col);
-    uchar nibble = GetHighNibble(&PORTC); 
-    *((Keys*)&g_Keys + col) = *(Keys*)&nibble;;       
+    ushort nibble = GetHighNibble(&PORTC);          
+    g_keyState |= (nibble << (col * 4));
 }
+
+uchar Matrix_GetColumn(uchar col)
+{
+    uchar keySection = (g_keyState >> (col * 4)) & 0x0F;
+    return keySection;
+}
+
+
+bool Matrix_IsButtonPressed(uchar columnState, uchar button)
+{
+    if(button > 3) return false;
+    bool isSet = (columnState & (1U << button));
+    return isSet;    
+}
+
+
 
