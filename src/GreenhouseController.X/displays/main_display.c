@@ -46,6 +46,11 @@ static inline void Draw(void)
     Lcd_WriteNumber(g_clock.date);
 
     // DRAW TEMP
+    /*
+
+    TEMP CODE HERE
+
+    */
 
     // MONTH & YEAR
     Lcd_SetCursorPosition(11, 4);
