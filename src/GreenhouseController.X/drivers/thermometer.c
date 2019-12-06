@@ -102,23 +102,11 @@ static uchar thermometer_reset(void)
     return 0;
 }
 
-static uchar s_ubyInterruptTriggerCount = 0;
-void __interrupt() thermometer_interrupt(void)
-{
-    if (PIR1bits.TMR2IF == 1)
-    {
-        s_ubyInterruptTriggerCount++;
-        if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
-        {
-            T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
-            Thermometer_bProcessTemperatureComplete = true;
-            s_ubyInterruptTriggerCount = 0;
-        }
-        
-        TMR2 = TMR2_VAL;
-        PIR1bits.TMR2IF = 0;
-    }
-}
+
+//void __interrupt() thermometer_interrupt(void)
+//{
+//
+//}
 
 void Thermometer_Init()
 {
@@ -183,8 +171,8 @@ uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBy
     
     for (uchar* pSpEntry = pScratchPad; pSpEntry < pSpEntry + byBytesToRead; pSpEntry++)
         *pSpEntry = thermometer_read_byte();
-//    
-//    byStatus = thermometer_reset();
+    
+    byStatus = thermometer_reset();
     
     return byStatus;
 }

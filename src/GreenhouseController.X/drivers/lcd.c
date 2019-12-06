@@ -13,7 +13,7 @@ static uchar s_ubyLineNumber = 1;
 static uchar s_ubyLinePos = 1;
 static uchar s_ubyDdramPos = 0;
 
-#define lcd_delay() for (int i=0; i<5000; i++);
+#define lcd_delay() for (int i=0; i<50; i++);
 
 #define lcd_write_command(data)\
     USE_INSTRUCTION_REG;\

@@ -15,7 +15,7 @@ bool Eeprom_Save()
     
     EEADR = 0;
     EECON1bits.WRERR = 0;
-    for (uchar* p = &g_Settings; p < &g_Settings + sizeof(EepromSettings); p++)
+    for (uchar* p = &Eeprom_Settings; p < &Eeprom_Settings + sizeof(Eeprom_EepromSettings); p++)
     {
         PIR2bits.EEIF = 0; //clear the eeprom finished interrupt flag.
         
@@ -48,7 +48,7 @@ void Eeprom_Load()
     EECON1bits.EEPGD = EEPROM_DATA;
     
     EEADR = 0;
-    for (uchar* p = &g_Settings; p < &g_Settings + sizeof(EepromSettings); p++)
+    for (uchar* p = &Eeprom_Settings; p < &Eeprom_Settings + sizeof(Eeprom_EepromSettings); p++)
     {
         EEDATA = 0x00;
         

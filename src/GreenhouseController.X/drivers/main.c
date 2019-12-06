@@ -14,7 +14,8 @@
 #include "thermometer.h"
 #include "eeprom.h"
 #include "../fst.h"
-
+#define TMR2_VAL 11
+#define TMR2_TRIGGER_COUNT 12
 //begin config
 #pragma config FOSC = HS // Oscillator Selection bits (HS oscillator)
 #pragma config WDTE = OFF//Watchdog Timer Enable bit (WDT enabled)
@@ -45,18 +46,32 @@ void main(void)
 {   
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
     Fst_Init();
-    //Thermometer_Init();
-    //Thermometer_ProcessTemperature();
+//    Thermometer_Init();
+//    Thermometer_ProcessTemperature();
 
-    DelaySeconds(1);
-    
     Fst_ProcessEvent(FST_EVENT_INITIALISED);
-    
+    uchar s_ubyInterruptTriggerCount = 0;
     while(1)
     {       
+        DelayMilliSeconds(150);
         Fst_Events event = Fst_Update();
         Fst_ProcessEvent(event);
         
+        Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
+//        if (PIR1bits.TMR2IF == 1)
+//        {
+//            s_ubyInterruptTriggerCount++;
+//            if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
+//            {
+//                T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
+//                Thermometer_bProcessTemperatureComplete = true;
+//                s_ubyInterruptTriggerCount = 0;
+//            }
+//
+//            TMR2 = TMR2_VAL;
+//            PIR1bits.TMR2IF = 0;
+//        }
+//        
 //        if (Thermometer_bProcessTemperatureComplete)
 //        {
 //            Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);

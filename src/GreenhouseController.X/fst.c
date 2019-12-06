@@ -39,21 +39,21 @@ static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullpt
 
 static const uchar s_ubyFstTable[FST_NUMBER_OF_STATES][FST_NUMBER_OF_EVENTS] ={
     /* BACK	SAVE  MENU1	MENU2 MENU3	LEFT  RIGHT	UP	  DOWN	SET   INIT  TEMP_UPDATED   */
-    /* 0 */
+    /* 0 INITIALISE */
     { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00 },
-    /* 1 */
-    { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20, 0x10, 0x10 },
-    /* 2 */
+    /* 1 MAIN */
+    { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20, 0x10, 0x19 },
+    /* 2 SETTINGS */
     { 0x10, 0x20, 0x41, 0x42, 0x30, 0x20, 0x20, 0x20, 0x20, 0x10, 0x20, 0x20 },
-    /* 3 */
+    /* 3 CLOCK SETTINGS */
     { 0x20, 0x30, 0x60, 0x70, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 },
-    /* 4 */
-    { 0x20, 0x40, 0x53, 0x54, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 },
-    /* 5 */
+    /* 4 TRIGGER OPTS */
+    { 0x20, 0x40, 0x54, 0x53, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 },
+    /* 5 TEMP ALARM SET */
     { 0x40, 0x10, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50 },
-    /* 6 */
+    /* 6 TIME SET */
     { 0x30, 0x10, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60 },
-    /* 7 */
+    /* 7 DATE SET */
     { 0x30, 0x10, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70 }
 };
 
@@ -69,6 +69,7 @@ void Fst_Init(void)
 //    Lcd_WriteString("Initialising...");
     
     //Initialise displays that need 
+    Main_Display_Init();
     Temp_Set_Display_Init();
 }
 
@@ -116,16 +117,13 @@ void Fst_ProcessEvent(Fst_Events event)
     uchar ubyNewFstValue = s_ubyFstTable[s_FstState][event];
 
     Fst_States newState = fst_get_state(ubyNewFstValue);
-    if (newState != s_FstState && newState <= FST_STATE_DATE_SET_SCREEN) 
+    if (newState != s_FstState) 
     {
         s_FstState = newState;
-        Lcd_SetCursorPosition(1, 2);
-        Lcd_WriteString("New State");
-        Lcd_WriteNumber(s_FstState);
         
         Lcd_ClearDisplay();
         Lcd_SetCursorPosition(1, 1);
-
+       
         switch (s_FstState) 
         {
             case FST_STATE_MAIN_SCREEN:
@@ -160,7 +158,7 @@ void Fst_ProcessEvent(Fst_Events event)
                 break;
         }
     }
-
+    
     Fst_ActionDelegate pAction = fst_get_action(ubyNewFstValue);
     if (pAction != nullptr)
         pAction();
@@ -199,7 +197,7 @@ Fst_Events Fst_Update(void)
     } else if (col4State == 1) // BACK
     {
         return (FST_EVENT_BACK_BUTTON);
-    } else if (col3State == 2) // LEFT
+    } else if (col3State == 4) // LEFT
     {
         return (FST_EVENT_LEFT_BUTTON);
     } else if (col2State == 8) // UP

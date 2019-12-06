@@ -3,12 +3,29 @@
 
 #include "../libs/std.h"
 
-typedef struct eepromSettings
-{
-    uchar temp;
-} EepromSettings;
+#define EEPROM_WARM_COLD_ALARM_BYTES 5
 
-EepromSettings g_Settings;
+typedef struct _alarmSettings
+{
+    uchar ubyWarmAlarmNegative;
+    uchar ubyWarmAlarmHundreds;
+    uchar ubyWarmAlarmTens;
+    uchar ubyWarmAlarmUnits;
+    uchar ubyWarmAlarmTenths;
+    uchar ubyColdAlarmNegative;
+    uchar ubyColdAlarmHundreds;
+    uchar ubyColdAlarmTens;
+    uchar ubyColdAlarmUnits;
+    uchar ubyColdAlarmTenths;
+} Eeprom_AlarmSettings;
+
+typedef struct _eepromSettings
+{
+    Eeprom_AlarmSettings daytimeAlarmSettings;
+    Eeprom_AlarmSettings nighttimeAlarmSettings;
+} Eeprom_EepromSettings;
+
+Eeprom_EepromSettings Eeprom_Settings;
 
 static void eeprom_init_write();
 bool Eeprom_Save();
