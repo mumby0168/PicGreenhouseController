@@ -7,6 +7,9 @@
 #define TMR2_VAL 11
 #define TMR2_TRIGGER_COUNT 12
 
+USING_DELAY_MICRO_SECONDS;
+
+//SL:6
 static void thermometer_write_byte(uchar val)
 {
     uchar byBitValue;
@@ -17,6 +20,7 @@ static void thermometer_write_byte(uchar val)
         RA0 = 0;
         TRISA0 = 0;
         
+        //SL:7
         NOP();                                                                              
         NOP();                                                                              
         NOP();                                                                              
@@ -36,25 +40,26 @@ static void thermometer_write_byte(uchar val)
     TRISA0 = 1;
 }
 
+//SL:5
 static uchar thermometer_read_byte(void)
-{ 
+{
     uchar ret = 0;    
     for (char i = 0; i < 8; i++)
     {
         RA0 = 0;
         TRISA0 = 0;
-        NOP();
-        NOP();
-        NOP();
-        NOP();
-        NOP();
-        NOP();                                    //6us              
+//        NOP();
+//        NOP();
+//        NOP();
+//        NOP();
+//        NOP();
+//        NOP();                                    //6us              
         TRISA0 = 1;      
-        NOP();                                                       
-        NOP();                                                       
-        NOP();                                                       
-        NOP();                                                       
-        NOP();                                   //4us               
+//        NOP();                                                       
+//        NOP();                                                       
+//        NOP();                                                       
+//        NOP();                                                       
+//        NOP();                                   //4us               
         ret |= RA0 << i;                                        
         DELAY_MICRO_SECONDS(63);                             //63us 
     }
@@ -62,6 +67,7 @@ static uchar thermometer_read_byte(void)
     return ret;
 }
 
+//SL:5
 static uchar thermometer_reset(void)
 {
     RA0 = 0;
@@ -163,6 +169,7 @@ uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig)
     return byStatus;
 }
 
+//SL:4
 uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBytesToRead)
 {
     uchar byStatus = 0;
@@ -176,8 +183,8 @@ uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBy
     
     for (uchar* pSpEntry = pScratchPad; pSpEntry < pSpEntry + byBytesToRead; pSpEntry++)
         *pSpEntry = thermometer_read_byte();
-    
-    byStatus = thermometer_reset();
+//    
+//    byStatus = thermometer_reset();
     
     return byStatus;
 }

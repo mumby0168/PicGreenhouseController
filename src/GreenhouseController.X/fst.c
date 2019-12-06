@@ -38,23 +38,23 @@ STATE/ACTION
 static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
 static const uchar s_ubyFstTable[FST_NUMBER_OF_STATES][FST_NUMBER_OF_EVENTS] ={
-    /* 0     1     2     3      4     5     6     7     8     9     10    11   */
+    /* BACK	SAVE  MENU1	MENU2 MENU3	LEFT  RIGHT	UP	  DOWN	SET   INIT  TEMP_UPDATED   */
     /* 0 */
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00},
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00 },
     /* 1 */
-    { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20, 0x10, 0x19},
+    { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20, 0x10, 0x10 },
     /* 2 */
-    { 0x10, 0x20, 0x41, 0x42, 0x30, 0x20, 0x20, 0x20, 0x20, 0x10, 0x20, 0x20},
+    { 0x10, 0x20, 0x41, 0x42, 0x30, 0x20, 0x20, 0x20, 0x20, 0x10, 0x20, 0x20 },
     /* 3 */
-    { 0x20, 0x30, 0x60, 0x70, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30},
+    { 0x20, 0x30, 0x60, 0x70, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 },
     /* 4 */
-    { 0x20, 0x40, 0x53, 0x54, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40},
+    { 0x20, 0x40, 0x53, 0x54, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 },
     /* 5 */
-    { 0x40, 0x10, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50},
+    { 0x40, 0x10, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50 },
     /* 6 */
-    { 0x30, 0x10, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60},
+    { 0x30, 0x10, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60 },
     /* 7 */
-    { 0x30, 0x10, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70}
+    { 0x30, 0x10, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70 }
 };
 
 void Fst_Init(void) 
@@ -62,11 +62,11 @@ void Fst_Init(void)
     s_FstState = FST_STATE_INITIALISING;
     Matrix_Init();
     
-    Lcd_ClearDisplay();
-    Lcd_SetCursorPosition(1, 1);
-    Lcd_WriteString("B&R Greenhouse Temperature Controller.");
-    Lcd_SetCursorPosition(1, 4);
-    Lcd_WriteString("Initialising...");
+//    Lcd_ClearDisplay();
+//    Lcd_SetCursorPosition(1, 1);
+//    Lcd_WriteString("B&R Greenhouse Temperature Controller.");
+//    Lcd_SetCursorPosition(1, 4);
+//    Lcd_WriteString("Initialising...");
     
     //Initialise displays that need 
     Temp_Set_Display_Init();
@@ -74,7 +74,9 @@ void Fst_Init(void)
 
 static uchar fst_get_state(const uchar ubyFstValue) 
 {
-    return (ubyFstValue & 0xF0) >> 4;
+    uchar ret = ubyFstValue & 0xF0;
+    ret = ret >> 4;
+    return ret;
 }
 
 static Fst_ActionDelegate fst_get_action(const uchar ubyFstValue) 
@@ -106,12 +108,20 @@ bool Fst_ClearAction(uchar ubyActionNumber)
 
 void Fst_ProcessEvent(Fst_Events event) 
 {
+    if (event == FST_EVENT_NO_EVENT)
+    {
+        return;
+    }
+    
     uchar ubyNewFstValue = s_ubyFstTable[s_FstState][event];
 
     Fst_States newState = fst_get_state(ubyNewFstValue);
-    if (newState != s_FstState) 
+    if (newState != s_FstState && newState <= FST_STATE_DATE_SET_SCREEN) 
     {
         s_FstState = newState;
+        Lcd_SetCursorPosition(1, 2);
+        Lcd_WriteString("New State");
+        Lcd_WriteNumber(s_FstState);
         
         Lcd_ClearDisplay();
         Lcd_SetCursorPosition(1, 1);
@@ -147,7 +157,6 @@ void Fst_ProcessEvent(Fst_Events event)
                 break;
 
             default:
-                Lcd_WriteString("Not Implemented");
                 break;
         }
     }
@@ -159,7 +168,8 @@ void Fst_ProcessEvent(Fst_Events event)
     return;
 }
 
-Fst_States Fst_Update(void) {
+Fst_Events Fst_Update(void) 
+{
     Matrix_usKeyState = 0;
 
     Matrix_CheckColumnState(0);
@@ -209,5 +219,5 @@ Fst_States Fst_Update(void) {
         return (FST_EVENT_BACK_BUTTON);
     }
     
-    return s_FstState;
+    return FST_EVENT_NO_EVENT;
 }

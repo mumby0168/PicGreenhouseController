@@ -45,8 +45,8 @@ void main(void)
 {   
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
     Fst_Init();
-    Thermometer_Init();
-    Thermometer_ProcessTemperature();
+    //Thermometer_Init();
+    //Thermometer_ProcessTemperature();
 
     DelaySeconds(1);
     
@@ -54,13 +54,14 @@ void main(void)
     
     while(1)
     {       
-        Fst_States newState = Fst_Update();
-        Fst_ProcessEvent(newState);
-        if (Thermometer_bProcessTemperatureComplete)
-        {
-            Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
-            Thermometer_ProcessTemperature();
-        }
+        Fst_Events event = Fst_Update();
+        Fst_ProcessEvent(event);
+        
+//        if (Thermometer_bProcessTemperatureComplete)
+//        {
+//            Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
+//            Thermometer_ProcessTemperature();
+//        }
     };
     
     return;

@@ -13,34 +13,27 @@ static uchar s_ubyLineNumber = 1;
 static uchar s_ubyLinePos = 1;
 static uchar s_ubyDdramPos = 0;
 
-static void lcd_delay()
-{
-    for (int i=0; i<5000; i++);
-}
+#define lcd_delay() for (int i=0; i<5000; i++);
 
-static void lcd_write_command(const uchar data)
-{    
-    USE_INSTRUCTION_REG
-    TRISD = 0x00;
-    Reset = 0;
-    ReadWrite = 0; 
-    PORTD = data;   
-    Enable = 0;
-    lcd_delay();
-    Enable = 1;
-    PORTD = 0;
-}
+#define lcd_write_command(data)\
+    USE_INSTRUCTION_REG;\
+    TRISD = 0x00;\
+    Reset = 0;\
+    ReadWrite = 0;\ 
+    PORTD = data; \ 
+    Enable = 0; \
+    lcd_delay();\
+    Enable = 1;\
+    PORTD = 0;\
 
-static void lcd_write_character(const char c)
-{
-    USE_DATA_REG
-    Reset = 1;
-    ReadWrite = 0;
-    PORTD = c;
-    Enable = 0;
-    lcd_delay();
-    Enable = 1;
-}
+#define lcd_write_character(c)\
+    USE_DATA_REG;\
+    Reset = 1;\
+    ReadWrite = 0;\
+    PORTD = c;\
+    Enable = 0;\
+    lcd_delay();\
+    Enable = 1;\
 
 inline static void lcd_set_ddram_address(const uchar pos)
 {

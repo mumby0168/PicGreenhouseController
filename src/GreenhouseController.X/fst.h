@@ -15,7 +15,8 @@ typedef enum fstEvents
     FST_EVENT_DOWN_BUTTON = 8,
     FST_EVENT_SETTINGS_BUTTON = 9,
     FST_EVENT_INITIALISED = 10,
-    FST_EVENT_PROCESS_TEMPERATURE_UPDATE = 11
+    FST_EVENT_PROCESS_TEMPERATURE_UPDATE = 11,
+    FST_EVENT_NO_EVENT = 0xFF
 } Fst_Events;
 
 typedef enum fstStates
@@ -50,6 +51,6 @@ bool Fst_ClearAction(uchar ubyActionNumber);
 
 void Fst_Init(void);
 void Fst_ProcessEvent(Fst_Events event);
-Fst_States Fst_Update(void);
+Fst_Events Fst_Update(void);
 
 #endif
