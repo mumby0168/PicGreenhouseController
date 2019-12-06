@@ -5,7 +5,8 @@
  * Created on 23 November 2019, 13:21
  */
 
-#include <xc.h> 
+#include <xc.h>
+#include <pic16f877a.h> 
 #include "./timing-chip.h"
 #include "./matrix.h"
 #include "../drivers/lcd.h"
@@ -46,37 +47,23 @@ void main(void)
 {   
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
     Fst_Init();
-//    Thermometer_Init();
-//    Thermometer_ProcessTemperature();
+    Thermometer_Init();
+    Thermometer_ProcessTemperature();
 
     Fst_ProcessEvent(FST_EVENT_INITIALISED);
-    uchar s_ubyInterruptTriggerCount = 0;
+
     while(1)
     {       
-        DelayMilliSeconds(150);
+        DelayMilliSeconds(75);
         Fst_Events event = Fst_Update();
         Fst_ProcessEvent(event);
         
-        Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
-//        if (PIR1bits.TMR2IF == 1)
-//        {
-//            s_ubyInterruptTriggerCount++;
-//            if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
-//            {
-//                T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
-//                Thermometer_bProcessTemperatureComplete = true;
-//                s_ubyInterruptTriggerCount = 0;
-//            }
-//
-//            TMR2 = TMR2_VAL;
-//            PIR1bits.TMR2IF = 0;
-//        }
-//        
-//        if (Thermometer_bProcessTemperatureComplete)
-//        {
-//            Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
-//            Thermometer_ProcessTemperature();
-//        }
+        Thermometer_Update();        
+        if (Thermometer_bProcessTemperatureComplete)
+        {
+            Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
+            Thermometer_ProcessTemperature();
+        }
     };
     
     return;

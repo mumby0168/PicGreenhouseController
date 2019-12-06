@@ -9,7 +9,7 @@
 
 USING_DELAY_MICRO_SECONDS;
 
-//SL:6
+static uchar s_ubyInterruptTriggerCount = 0;
 static void thermometer_write_byte(uchar val)
 {
     uchar byBitValue;
@@ -40,6 +40,28 @@ static void thermometer_write_byte(uchar val)
     TRISA0 = 1;
 }
 
+#define THERMOMETER_READ_BYTE(value)\
+value = 0;\
+for (char i = 0; i < 8; i++)\
+{\
+    RA0 = 0;\
+    TRISA0 = 0;\
+    NOP();\
+    NOP();\
+    NOP();\
+    NOP();\
+    NOP();\
+    NOP(); \
+    TRISA0 = 1;\
+    NOP();\
+    NOP();       \
+    NOP();        \
+    NOP();         \
+    NOP();          \
+    value |= RA0 << i; \
+    DELAY_MICRO_SECONDS(63);\
+}
+
 //SL:5
 static uchar thermometer_read_byte(void)
 {
@@ -48,18 +70,18 @@ static uchar thermometer_read_byte(void)
     {
         RA0 = 0;
         TRISA0 = 0;
-//        NOP();
-//        NOP();
-//        NOP();
-//        NOP();
-//        NOP();
-//        NOP();                                    //6us              
+        NOP();
+        NOP();
+        NOP();
+        NOP();
+        NOP();
+        NOP();                                    //6us              
         TRISA0 = 1;      
-//        NOP();                                                       
-//        NOP();                                                       
-//        NOP();                                                       
-//        NOP();                                                       
-//        NOP();                                   //4us               
+        NOP();                                                       
+        NOP();                                                       
+        NOP();                                                       
+        NOP();                                                       
+        NOP();                                   //4us               
         ret |= RA0 << i;                                        
         DELAY_MICRO_SECONDS(63);                             //63us 
     }
@@ -102,17 +124,9 @@ static uchar thermometer_reset(void)
     return 0;
 }
 
-
-//void __interrupt() thermometer_interrupt(void)
-//{
-//
-//}
-
 void Thermometer_Init()
 {
     Thermometer_bProcessTemperatureComplete = false;
-    INTCONbits.GIE = 0;
-    INTCONbits.PEIE = 1;
     PIR1bits.TMR2IF = 0; //clear the flag
     PIE1bits.TMR2IE = 1; //enable timer 2  
     /*
@@ -143,6 +157,23 @@ void Thermometer_Init()
     TMR2 = TMR2_VAL;
 }
 
+void Thermometer_Update()
+{
+    if (PIR1bits.TMR2IF == 1)
+    {
+        s_ubyInterruptTriggerCount++;
+        if (s_ubyInterruptTriggerCount > TMR2_TRIGGER_COUNT)
+        {
+            T2CONbits.TMR2ON = 0; //turn off the timer until the next time process temp is called...
+            Thermometer_bProcessTemperatureComplete = true;
+            s_ubyInterruptTriggerCount = 0;
+        }
+
+        TMR2 = TMR2_VAL;
+        PIR1bits.TMR2IF = 0;
+    }
+}
+
 uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig)
 {
     uchar byStatus = 0;
@@ -170,7 +201,9 @@ uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBy
         byBytesToRead = sizeof(Thermometer_ScratchPad);
     
     for (uchar* pSpEntry = pScratchPad; pSpEntry < pSpEntry + byBytesToRead; pSpEntry++)
-        *pSpEntry = thermometer_read_byte();
+    {
+        THERMOMETER_READ_BYTE(*pSpEntry);
+    }
     
     byStatus = thermometer_reset();
     

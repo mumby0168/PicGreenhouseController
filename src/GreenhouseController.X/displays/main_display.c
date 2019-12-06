@@ -7,6 +7,8 @@
 
 static char* days[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 static char* months[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+static Thermometer_BcdTemperature s_ThermBcd;
+
 
 static inline void main_display_redraw_dynamic_elements(void)
 {
@@ -35,25 +37,25 @@ static inline void main_display_redraw_dynamic_elements(void)
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.year);
     
-//    Thermometer_ScratchPad sp;
-//    Thermometer_ReadScratchPad(&sp, 2);
-//    Thermometer_BcdTemperature tempBcd;
-//    Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
-//    
-//    Lcd_SetCursorPosition(1, 2);
-//    if (tempBcd.bIsNegative)
-//        Lcd_WriteCharacter('-');
-//    else
-//        Lcd_WriteCharacter(' ');
-//    
-//    Lcd_WriteCharacter(tempBcd.ubyHundreds + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyTens + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyUnits + 48);
-//    Lcd_WriteCharacter('.');
-//    Lcd_WriteCharacter(tempBcd.ubyTenths);
-//    Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
+    Thermometer_ScratchPad sp;
+    Thermometer_ReadScratchPad(&sp, 2);
+    Thermometer_BcdTemperature tempBcd;
+    Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
+    
+    Lcd_SetCursorPosition(1, 2);
+    if (tempBcd.bIsNegative)
+        Lcd_WriteCharacter('-');
+    else
+        Lcd_WriteCharacter(' ');
+    
+    Lcd_WriteCharacter(tempBcd.ubyHundreds + 48);
+    Lcd_WriteCharacter(tempBcd.ubyTens + 48);
+    Lcd_WriteCharacter(tempBcd.ubyUnits + 48);
+    Lcd_WriteCharacter('.');
+    Lcd_WriteCharacter(tempBcd.ubyTenths);
+    Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
+    Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
+    Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
 }
 
 void Main_Display_Init(void)
@@ -93,23 +95,25 @@ void Main_Display(void)
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.year);
     
-//    Thermometer_ScratchPad sp;
-//    Thermometer_ReadScratchPad(&sp, 2);
-//    Thermometer_BcdTemperature tempBcd;
-//    Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
-//    
-//    Lcd_SetCursorPosition(1, 2);
-//    if (tempBcd.bIsNegative)
-//        Lcd_WriteCharacter('-');
-//    else
-//        Lcd_WriteCharacter(' ');
-//    
-//    Lcd_WriteCharacter(tempBcd.ubyHundreds + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyTens + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyUnits + 48);
-//    Lcd_WriteCharacter('.');
-//    Lcd_WriteCharacter(tempBcd.ubyTenths);
-//    Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
-//    Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
+    Thermometer_ScratchPad sp;
+    Thermometer_ReadScratchPad(&sp, 2);
+    Thermometer_BcdTemperature tempBcd;
+    Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
+    
+    Lcd_SetCursorPosition(1, 2);
+    if (tempBcd.bIsNegative)
+        Lcd_WriteCharacter('-');
+    else
+        Lcd_WriteCharacter('+');
+    
+    Lcd_WriteCharacter(tempBcd.ubyHundreds + 48);
+    Lcd_WriteCharacter(tempBcd.ubyTens + 48);
+    Lcd_WriteCharacter(tempBcd.ubyUnits + 48);
+    Lcd_WriteCharacter('.');
+    Lcd_WriteCharacter(tempBcd.ubyTenths + 48);
+    Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
+    Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
+    Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
+    
+    s_ThermBcd = tempBcd;
 }

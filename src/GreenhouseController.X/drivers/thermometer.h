@@ -36,6 +36,7 @@ typedef struct _thermometer_bcdTemperature
 volatile bool Thermometer_bProcessTemperatureComplete;
 
 void Thermometer_Init();
+void Thermometer_Update();
 uchar Thermometer_ProcessTemperature(void);
 uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig);
 uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBytesToRead);
