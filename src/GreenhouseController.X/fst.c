@@ -35,7 +35,7 @@ STATE/ACTION
 1/2 -> 0x12												
  **/
 
-static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
 static const uchar s_ubyFstTable[FST_NUMBER_OF_STATES][FST_NUMBER_OF_EVENTS] ={
     /* BACK	SAVE  MENU1	MENU2 MENU3	LEFT  RIGHT	UP	  DOWN	SET   INIT  TEMP_UPDATED   */

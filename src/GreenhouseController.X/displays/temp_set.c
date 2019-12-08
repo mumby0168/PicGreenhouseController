@@ -9,7 +9,7 @@ static bool s_IsHot = false;
 static bool s_IsDay = false;
 
 static s_ubySelectedDigit = 0;
-static uchar s_aubyDigitLimits[5] = { 1, 1, 2, 5, 9 };
+static uchar s_aubyDigitLimits[5] = { 1, 1, 9, 9, 9 };
 
 
 static void temp_set_display_select_cold_settings()

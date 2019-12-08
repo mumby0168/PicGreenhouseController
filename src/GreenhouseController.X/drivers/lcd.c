@@ -19,13 +19,13 @@ static uchar s_ubyDdramPos = 0;
     USE_INSTRUCTION_REG;\
     TRISD = 0x00;\
     Reset = 0;\
-    ReadWrite = 0;\ 
-    PORTD = data; \ 
+    ReadWrite = 0;\
+    PORTD = data; \
     Enable = 0; \
     lcd_delay();\
     Enable = 1;\
     PORTD = 0;\
-
+    
 #define lcd_write_character(c)\
     USE_DATA_REG;\
     Reset = 1;\
