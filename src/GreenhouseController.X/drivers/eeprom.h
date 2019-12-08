@@ -23,6 +23,7 @@ typedef struct _eepromSettings
 {
     Eeprom_AlarmSettings daytimeAlarmSettings;
     Eeprom_AlarmSettings nighttimeAlarmSettings;
+    const uchar ubyHasBeenBlanked;
 } Eeprom_EepromSettings;
 
 Eeprom_EepromSettings Eeprom_Settings;

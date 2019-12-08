@@ -3,6 +3,7 @@
 #include "../drivers/lcd.h"
 #include "../fst.h"
 #include "../drivers/eeprom.h"
+#include "../libs/Delays.h"
 
 
 static bool s_IsHot = false;
@@ -17,6 +18,8 @@ static void temp_set_display_select_cold_settings()
     s_IsHot = false;
     Lcd_SetCursorPosition(12, 1);
     Lcd_WriteString(g_Cold);
+
+    Temp_Set_Display();
 }
 
 static void temp_set_display_select_hot_settings()
@@ -24,6 +27,8 @@ static void temp_set_display_select_hot_settings()
     s_IsHot = true;
     Lcd_SetCursorPosition(12, 1);
     Lcd_WriteString(g_Warm);
+    
+    Temp_Set_Display();
 }
 
 static void temp_set_display_load_day_settings()
@@ -124,7 +129,7 @@ static void temp_set_display_down_arrow()
     Lcd_WriteCharacter(*pSettingData + 48);
 }
 
-void temp_set_display_left_arrow()
+static void temp_set_display_left_arrow()
 {
     if (s_ubySelectedDigit == 0)
         s_ubySelectedDigit = 4;
@@ -132,14 +137,35 @@ void temp_set_display_left_arrow()
         s_ubySelectedDigit -= 1;
 }
 
-void temp_set_display_right_arrow()
+static void temp_set_display_right_arrow()
 {
     if (++s_ubySelectedDigit > 4)
         s_ubySelectedDigit = 0;
 }
 
+static void temp_set_display_save()
+{
+    if (!Eeprom_Save())
+    {
+        Lcd_ClearDisplay();
+        Lcd_SetCursorPosition(1, 1);
+        Lcd_WriteString("Failed to save settings.");
+        DelaySeconds(1);
+        Lcd_ClearDisplay();
+    }
+    else
+    {
+        Lcd_ClearDisplay();
+        Lcd_SetCursorPosition(1, 1);
+        Lcd_WriteString("Saved settings.");
+        DelaySeconds(1);
+        Lcd_ClearDisplay();
+    }
+}
+
 void Temp_Set_Display(void)
 {     
+    Eeprom_Load();
     s_ubySelectedDigit = 0;
     Fst_ClearAction(FST_ACTION_HANDLE_UP_BUTTON);
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &temp_set_display_up_arrow);
@@ -152,6 +178,9 @@ void Temp_Set_Display(void)
     
     Fst_ClearAction(FST_ACTION_HANDLE_RIGHT_BUTTON);
     Fst_SetAction(FST_ACTION_HANDLE_RIGHT_BUTTON, &temp_set_display_right_arrow);
+    
+    Fst_ClearAction(FST_ACTION_SAVE);
+    Fst_SetAction(FST_ACTION_SAVE, &temp_set_display_save);
     
     uchar* pSettingData = &Eeprom_Settings;
     

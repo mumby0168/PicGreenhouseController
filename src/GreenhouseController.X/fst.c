@@ -16,7 +16,7 @@
 static Fst_States s_FstState;
 #define FST_NUMBER_OF_STATES 8
 #define FST_NUMBER_OF_EVENTS 12
-#define FST_NUMBER_OF_ACTIONS 10
+#define FST_NUMBER_OF_ACTIONS 11
 
 /*
 STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9           10              11                  ACTION
@@ -30,12 +30,13 @@ EVENT		        BACK	SAVE	MENU1	MENU2	MENU3	LEFT	RIGHT	UP	DOWN	SETTINGS    INITIA
 6	TIME SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0                 7	INCREMENT DIGIT
 7	DATE SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0                 8	DECREMENT DIGIT
                                                                                                                                         9   REDRAW TEMP
+ *                                                                                                                                      A   save
 STATE/ACTION													
 - MEANS REMAIN IN SAME STATE. So the table below sets it the the current state
 1/2 -> 0x12												
  **/
 
-static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
+static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
 static const uchar s_ubyFstTable[FST_NUMBER_OF_STATES][FST_NUMBER_OF_EVENTS] ={
     /* BACK	SAVE  MENU1	MENU2 MENU3	LEFT  RIGHT	UP	  DOWN	SET   INIT  TEMP_UPDATED   */
@@ -50,11 +51,11 @@ static const uchar s_ubyFstTable[FST_NUMBER_OF_STATES][FST_NUMBER_OF_EVENTS] ={
     /* 4 TRIGGER OPTS */
     { 0x20, 0x40, 0x54, 0x53, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 },
     /* 5 TEMP ALARM SET */
-    { 0x40, 0x10, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50 },
+    { 0x40, 0x1A, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50 },
     /* 6 TIME SET */
-    { 0x30, 0x10, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60 },
+    { 0x30, 0x1A, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60 },
     /* 7 DATE SET */
-    { 0x30, 0x10, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70 }
+    { 0x30, 0x1A, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70 }
 };
 
 void Fst_Init(void) 
@@ -214,7 +215,7 @@ Fst_Events Fst_Update(void)
         return (FST_EVENT_RIGHT_BUTTON);
     } else if (col1State == 1) // BACK
     {
-        return (FST_EVENT_BACK_BUTTON);
+        return (FST_EVENT_SAVE_BUTTON);
     }
     
     return FST_EVENT_NO_EVENT;

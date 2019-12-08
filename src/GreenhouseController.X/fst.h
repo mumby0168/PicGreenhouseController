@@ -42,7 +42,8 @@ typedef enum fstActions
     FST_ACTION_HANDLE_RIGHT_BUTTON = 6,
     FST_ACTION_HANDLE_UP_BUTTON = 7,
     FST_ACTION_HANDLE_DOWN_BUTTON = 8,
-    FST_ACTION_REDRAW_TEMPERATURE = 9
+    FST_ACTION_REDRAW_TEMPERATURE = 9,
+    FST_ACTION_SAVE = 10
 } Fst_Actions;
 
 typedef void (*Fst_ActionDelegate)();

@@ -1,5 +1,6 @@
 #include <xc.h>
 #include "eeprom.h"
+#include "lcd.h"
 
 #define EEPROM_DATA 0
 #define EEPROM_DISABLE_WRITE 0
@@ -14,8 +15,9 @@ bool Eeprom_Save()
     //initialise the write
     
     EEADR = 0;
-    EECON1bits.WRERR = 0;
-    for (uchar* p = &Eeprom_Settings; p < &Eeprom_Settings + sizeof(Eeprom_EepromSettings); p++)
+    EECON1bits.WRERR = 0;    
+    uchar* pEepromSettings = &Eeprom_Settings;
+    for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
     {
         PIR2bits.EEIF = 0; //clear the eeprom finished interrupt flag.
         
@@ -39,6 +41,7 @@ bool Eeprom_Save()
     
     EECON1bits.WREN = EEPROM_DISABLE_WRITE;
     PIR2bits.EEIF = 0;
+        
     return true;
 }
 
@@ -48,13 +51,22 @@ void Eeprom_Load()
     EECON1bits.EEPGD = EEPROM_DATA;
     
     EEADR = 0;
-    for (uchar* p = &Eeprom_Settings; p < &Eeprom_Settings + sizeof(Eeprom_EepromSettings); p++)
+    uchar* pEepromSettings = &Eeprom_Settings;
+    for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
     {
         EEDATA = 0x00;
         
         EECON1bits.RD = EEPREOM_START_READ;
         *p = EEDATA;
-        
+
         EEADR++;
+    }
+    
+    if (Eeprom_Settings.ubyHasBeenBlanked == 0xFF)
+    {
+        for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
+            *p = 0;
+        
+        Eeprom_Save();
     }
 }

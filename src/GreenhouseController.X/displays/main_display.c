@@ -44,16 +44,17 @@ static inline void main_display_redraw_dynamic_elements(void)
     if (tempBcd.bIsNegative)
         Lcd_WriteCharacter('-');
     else
-        Lcd_WriteCharacter(' ');
+        Lcd_WriteCharacter('+');
     
     Lcd_WriteCharacter(tempBcd.ubyHundreds + 48);
     Lcd_WriteCharacter(tempBcd.ubyTens + 48);
     Lcd_WriteCharacter(tempBcd.ubyUnits + 48);
     Lcd_WriteCharacter('.');
-    Lcd_WriteCharacter(tempBcd.ubyTenths);
+    Lcd_WriteCharacter(tempBcd.ubyTenths + 48);
     Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
     Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
     Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
+    Lcd_WriteCharacter('C');
 }
 
 void Main_Display_Init(void)
@@ -112,4 +113,5 @@ void Main_Display(void)
     Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
     Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
     Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
+    Lcd_WriteCharacter('C');
 }

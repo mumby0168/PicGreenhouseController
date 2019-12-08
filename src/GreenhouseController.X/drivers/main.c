@@ -31,6 +31,7 @@
 void main(void) 
 {   
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
+    Eeprom_Load();
     Fst_Init();
     Thermometer_Init();
     Thermometer_ProcessTemperature();
