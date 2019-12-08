@@ -7,8 +7,6 @@
 
 static char* days[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 static char* months[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
-static Thermometer_BcdTemperature s_ThermBcd;
-
 
 static inline void main_display_redraw_dynamic_elements(void)
 {
@@ -114,6 +112,4 @@ void Main_Display(void)
     Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
     Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
     Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
-    
-    s_ThermBcd = tempBcd;
 }

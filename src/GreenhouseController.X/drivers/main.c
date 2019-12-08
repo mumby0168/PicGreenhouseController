@@ -28,21 +28,6 @@
 #define DEMO
 
 #ifdef DEMO
-void PrintTemperatureBcdValue(Thermometer_BcdTemperature* temperatureBcdValue)
-{
-    if (temperatureBcdValue->bIsNegative)
-        Lcd_WriteCharacter('-');
-
-    Lcd_WriteCharacter(temperatureBcdValue->ubyHundreds + 48);
-    Lcd_WriteCharacter(temperatureBcdValue->ubyTens + 48);
-    Lcd_WriteCharacter(temperatureBcdValue->ubyUnits + 48);
-    Lcd_WriteCharacter('.');
-    Lcd_WriteCharacter(temperatureBcdValue->ubyTenths + 48);
-    Lcd_WriteCharacter(temperatureBcdValue->ubyHundredths + 48);
-    Lcd_WriteCharacter(temperatureBcdValue->ubyThousandths + 48);
-    Lcd_WriteCharacter(temperatureBcdValue->ubyTenThousandths + 48);
-} 
-
 void main(void) 
 {   
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.

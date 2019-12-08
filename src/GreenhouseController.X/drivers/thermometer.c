@@ -200,9 +200,9 @@ uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBy
     if (byBytesToRead > sizeof(Thermometer_ScratchPad))
         byBytesToRead = sizeof(Thermometer_ScratchPad);
     
-    for (uchar* pSpEntry = pScratchPad; pSpEntry < pSpEntry + byBytesToRead; pSpEntry++)
+    for (uchar* pSpEntry = pScratchPad; pSpEntry < pScratchPad + byBytesToRead; pSpEntry++)
     {
-        THERMOMETER_READ_BYTE(*pSpEntry);
+        *pSpEntry = thermometer_read_byte();
     }
     
     byStatus = thermometer_reset();
@@ -241,7 +241,7 @@ uchar Thermometer_ProcessTemperature(void)
     thermometer_write_byte(0x44);
 
     Thermometer_bProcessTemperatureComplete = false;
-    T2CONbits.TMR2ON = 1;
+    //T2CONbits.TMR2ON = 1;
     return 0;
 }
 
