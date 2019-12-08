@@ -133,5 +133,5 @@ static void display_time()
     Lcd_WriteCharacter(58);
 
     Lcd_WriteNumber(g_clockSet.secondsTens);
-    Lcd_WriteNumber(g_clockSet.secondDigits);
+    Lcd_WriteNumber(g_clockSet.secondsDigits);
 }
