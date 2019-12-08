@@ -12,6 +12,25 @@ static bool s_IsDay = false;
 static s_ubySelectedDigit = 0;
 static uchar s_aubyDigitLimits[5] = { 1, 1, 9, 9, 9 };
 
+static void temp_set_display_render_temp(uchar* pSettingData)
+{
+    Lcd_SetCursorPosition(5, 2);
+    if (*pSettingData)
+        Lcd_WriteCharacter('-');
+    else
+        Lcd_WriteCharacter('+');
+
+    pSettingData++;
+    Lcd_WriteCharacter(*pSettingData + 48);
+    pSettingData++;
+    Lcd_WriteCharacter(*pSettingData + 48);
+    pSettingData++;
+    Lcd_WriteCharacter(*pSettingData + 48);
+    Lcd_WriteCharacter('.');
+    pSettingData++;
+    Lcd_WriteCharacter(*pSettingData + 48);
+    Lcd_WriteCharacter('C');
+}
 
 static void temp_set_display_select_cold_settings()
 {
@@ -43,16 +62,9 @@ static void temp_set_display_load_night_settings()
 
 void Temp_Set_Display_Init(void)
 {
-    Fst_ClearAction(FST_ACTION_COLD_SETTINGS);
     Fst_SetAction(FST_ACTION_COLD_SETTINGS, &temp_set_display_select_cold_settings);
-    
-    Fst_ClearAction(FST_ACTION_HOT_SETTINGS);
     Fst_SetAction(FST_ACTION_HOT_SETTINGS, &temp_set_display_select_hot_settings);
-    
-    Fst_ClearAction(FST_ACTION_LOAD_DAY_SETTINGS);
     Fst_SetAction(FST_ACTION_LOAD_DAY_SETTINGS, &temp_set_display_load_day_settings);
-    
-    Fst_ClearAction(FST_ACTION_LOAD_NIGHT_SETTINGS);
     Fst_SetAction(FST_ACTION_LOAD_NIGHT_SETTINGS, &temp_set_display_load_night_settings);
 }
 
@@ -74,21 +86,7 @@ static void temp_set_display_up_arrow()
     
     pSettingData -= s_ubySelectedDigit;
     
-    Lcd_SetCursorPosition(5, 2);
-    if (*pSettingData)
-        Lcd_WriteCharacter('-');
-    else
-        Lcd_WriteCharacter('+');
-
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    Lcd_WriteCharacter('.');
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
+    temp_set_display_render_temp(pSettingData);
 }
     
 static void temp_set_display_down_arrow()
@@ -112,21 +110,7 @@ static void temp_set_display_down_arrow()
     
     pSettingData -= s_ubySelectedDigit;
     
-    Lcd_SetCursorPosition(5, 2);
-    if (*pSettingData)
-        Lcd_WriteCharacter('-');
-    else
-        Lcd_WriteCharacter('+');
-
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    Lcd_WriteCharacter('.');
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
+    temp_set_display_render_temp(pSettingData);
 }
 
 static void temp_set_display_left_arrow()
@@ -135,12 +119,18 @@ static void temp_set_display_left_arrow()
         s_ubySelectedDigit = 4;
     else
         s_ubySelectedDigit -= 1;
+    
+//    Lcd_SetCursorPosition(5 + s_ubySelectedDigit, 2);
+//    Lcd_WriteCharacter('^');
 }
 
 static void temp_set_display_right_arrow()
 {
     if (++s_ubySelectedDigit > 4)
         s_ubySelectedDigit = 0;
+    
+//    Lcd_SetCursorPosition(5 + s_ubySelectedDigit, 2);
+//    Lcd_WriteCharacter('^');
 }
 
 static void temp_set_display_save()
@@ -167,19 +157,11 @@ void Temp_Set_Display(void)
 {     
     Eeprom_Load();
     s_ubySelectedDigit = 0;
-    Fst_ClearAction(FST_ACTION_HANDLE_UP_BUTTON);
+    
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &temp_set_display_up_arrow);
-    
-    Fst_ClearAction(FST_ACTION_HANDLE_DOWN_BUTTON);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &temp_set_display_down_arrow);
-    
-    Fst_ClearAction(FST_ACTION_HANDLE_LEFT_BUTTON);
     Fst_SetAction(FST_ACTION_HANDLE_LEFT_BUTTON, &temp_set_display_left_arrow);
-    
-    Fst_ClearAction(FST_ACTION_HANDLE_RIGHT_BUTTON);
     Fst_SetAction(FST_ACTION_HANDLE_RIGHT_BUTTON, &temp_set_display_right_arrow);
-    
-    Fst_ClearAction(FST_ACTION_SAVE);
     Fst_SetAction(FST_ACTION_SAVE, &temp_set_display_save);
     
     uchar* pSettingData = &Eeprom_Settings;
@@ -207,22 +189,10 @@ void Temp_Set_Display(void)
     }
 
     Lcd_SetCursorPosition(5, 2);
-    if (*pSettingData)
-        Lcd_WriteCharacter('-');
-    else
-        Lcd_WriteCharacter('+');
-        
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
-    Lcd_WriteCharacter('.');
-    pSettingData++;
-    Lcd_WriteCharacter(*pSettingData + 48);
     
-    Lcd_SetCursorPosition(0,4);
+    temp_set_display_render_temp(pSettingData);
+    
+    Lcd_SetCursorPosition(1,4);
     Lcd_WriteString(g_Back);
 
     Lcd_SetCursorPosition(12,4);

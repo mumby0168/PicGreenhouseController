@@ -21,13 +21,12 @@ typedef struct
 
 typedef struct 
 {
-    uchar secondsTens;
-    uchar secondDigits;
-    uchar minutesTens;
-    uchar minutesDigits;
     uchar hoursTens;
     uchar hoursDigits;
-
+    uchar minutesTens;
+    uchar minutesDigits;
+    uchar secondsTens;
+    uchar secondsDigits;    
 } RawClock;
 
 
@@ -40,5 +39,7 @@ void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year);
 void Timing_ReadTime(void);
 void Timing_ReadCalendar(void);
 void Timing_Init(void);
+bool Timing_IsLeapYear(const uchar year);
+uchar Timing_GetDayFromDate(const uchar date, const uchar month, const uchar year);
 
 #endif

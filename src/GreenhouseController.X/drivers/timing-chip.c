@@ -6,6 +6,7 @@
 #include "timing-chip.h"
 #include "../libs/BinaryUtillities.h"
 #include <xc.h>
+#include "../libs/std.h"
 
 
 /**************************Defines*****************************/
@@ -48,16 +49,6 @@
 #define COMPLETE_OPERATION RST = 0;
 
 
-/*********************Forward Declarations*********************/
-
-inline void memset(void* const ptr, const unsigned char c, const unsigned int len)
-{
-    for (char* p = (char*)ptr; p < p + len; p++)
-        *p = c;
-}
-
-#define ZERO_MEMORY(ptr, type) memset(ptr, 0, sizeof(type))
-
 //Write Operations
 static void WriteDate(uchar data);
 static void WriteSeconds(uchar seconds);
@@ -91,9 +82,6 @@ void WriteByte(uchar*);
 void Timing_Init()
 {
     //Init structs    
-    ZERO_MEMORY(&g_clock, Clock);     
-    ZERO_MEMORY(&g_rawClock, RawClock);    
-
     //set clock as output & send 0.
     SCKL_CONFIG = 0;
     SCLK = 0;
@@ -180,9 +168,38 @@ void Timing_ReadCalendar()
     COMPLETE_OPERATION
 }
 
+//Guidance from here https://www.mathsisfun.com/leap-years.html
+bool Timing_IsLeapYear(const uchar year)
+{
+    if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
+        return true;
+    
+    return false;
+}
+
+//Following the key value method from this website http://mathforum.org/dr.math/faq/faq.calendar.html
+static uchar s_aubyMonthKeyValue[12] = { 1, 4, 4, 0, 2, 5, 0, 3, 6, 1, 4, 6 };
+static uchar s_aubyDayOfWeekMap[7] = { 6, 7, 1, 2, 3, 4, 5 }; // From website: This time, 1 means Sunday, 2 means Monday,
+uchar Timing_GetDayFromDate(const uchar date, const uchar month, const uchar year)
+{
+    uchar a = year / 4;
+    a += date;
+    a += s_aubyMonthKeyValue[month - 1];
+    
+    if (Timing_IsLeapYear(year) && (month == 1 || month == 2))
+    {
+        a -= 1;
+    }
+    
+    a += 6; //assuming 2000's as no opt to specify first two digits
+    a += year;
+    
+    a %= 7;
+    
+    return s_aubyDayOfWeekMap[a];
+}
 
 //Low Level API
-
 inline void WriteCommandByte(uchar byte)
 {    
     //set io pin to output
@@ -305,7 +322,7 @@ static void ReadSeconds()
     uchar temp = AssembleByte();
     uchar tens = (temp & 0x70) >> 4;    
     uchar digits = (temp & 0x0F);        
-    g_rawClock.secondDigits = digits;
+    g_rawClock.secondsDigits = digits;
     g_rawClock.secondsTens = tens;
     g_clock.seconds = (tens * 10) + digits;
 }

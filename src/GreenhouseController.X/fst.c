@@ -70,6 +70,7 @@ void Fst_Init(void)
 //    Lcd_WriteString("Initialising...");
     
     //Initialise displays that need 
+    Timing_Init();
     Main_Display_Init();
     Temp_Set_Display_Init();
 }
@@ -86,26 +87,9 @@ static Fst_ActionDelegate fst_get_action(const uchar ubyFstValue)
     return s_FstActions[(ubyFstValue & 0x0F)];
 }
 
-bool Fst_SetAction(uchar ubyActionNumber, Fst_ActionDelegate pDelegate) 
+void Fst_SetAction(uchar ubyActionNumber, Fst_ActionDelegate pDelegate) 
 {
-    if (ubyActionNumber == 0 || ubyActionNumber > FST_NUMBER_OF_ACTIONS || s_FstActions[ubyActionNumber] != nullptr) {
-        return false;
-    }
-
     s_FstActions[ubyActionNumber] = pDelegate;
-
-    return true;
-}
-
-bool Fst_ClearAction(uchar ubyActionNumber) 
-{
-    if (ubyActionNumber == 0 || ubyActionNumber > FST_NUMBER_OF_ACTIONS || s_FstActions[ubyActionNumber] == nullptr) {
-        return false;
-    }
-
-    s_FstActions[ubyActionNumber] = nullptr;
-
-    return true;
 }
 
 void Fst_ProcessEvent(Fst_Events event) 

@@ -47,8 +47,7 @@ typedef enum fstActions
 } Fst_Actions;
 
 typedef void (*Fst_ActionDelegate)();
-bool Fst_SetAction(uchar ubyActionNumber, Fst_ActionDelegate pDelegate);
-bool Fst_ClearAction(uchar ubyActionNumber);
+void Fst_SetAction(uchar ubyActionNumber, Fst_ActionDelegate pDelegate);
 
 void Fst_Init(void);
 void Fst_ProcessEvent(Fst_Events event);

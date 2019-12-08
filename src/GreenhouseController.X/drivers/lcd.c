@@ -92,13 +92,9 @@ void Lcd_WriteNumber(char num)
         Lcd_WriteCharacter(126);
         return;
     }
-    if(num > 10)
-    {
-        char tens = num / 10;
-        Lcd_WriteCharacter(tens + 48);
-    }
-    char digits = num % 10;
-    Lcd_WriteCharacter(digits + 48);
+    
+    Lcd_WriteCharacter((num / 10) + 48);
+    Lcd_WriteCharacter((num % 10) + 48);
 }
 
 void Lcd_SetCursorPosition(uchar ubyPos, uchar ubyLine)

@@ -57,6 +57,7 @@
       <logicalFolder name="f2" displayName="Libs" projectFiles="true">
         <itemPath>libs/BinaryUtillities.c</itemPath>
         <itemPath>libs/Delays.c</itemPath>
+        <itemPath>std.c</itemPath>
       </logicalFolder>
       <itemPath>drivers/main.c</itemPath>
     </logicalFolder>

@@ -10,5 +10,7 @@ typedef unsigned char uchar;
 typedef uchar bool;
 typedef unsigned short ushort;
 
+void memcpy(uchar* const pTarget, const uchar* const pSource, const uchar ubySize);
+
 #endif	/* XC_HEADER_TEMPLATE_H */
 

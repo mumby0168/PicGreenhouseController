@@ -5,7 +5,7 @@
 #include "lcd.h"
 
 #define TMR2_VAL 11
-#define TMR2_TRIGGER_COUNT 12
+#define TMR2_TRIGGER_COUNT 6
 
 USING_DELAY_MICRO_SECONDS;
 
