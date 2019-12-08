@@ -241,7 +241,7 @@ uchar Thermometer_ProcessTemperature(void)
     thermometer_write_byte(0x44);
 
     Thermometer_bProcessTemperatureComplete = false;
-    //T2CONbits.TMR2ON = 1;
+    T2CONbits.TMR2ON = 1;
     return 0;
 }
 
