@@ -15,6 +15,8 @@ void Alarm_Program_Init(void)
 {
     TRISE = 0b000;
     PORTE = 0b000;    
+    
+    Alarm_Program_Update();
 }
 
 static int alarm_program_get_temp_as_short(const Thermometer_BcdTemperature* const pBcd)
@@ -50,17 +52,17 @@ void Alarm_Program_Update(void)
     Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
     int sCurrentTemp = alarm_program_get_temp_as_short(&tempBcd);
     int sHighTemp = alarm_program_get_temp_as_short(pSettings);
-    int sLowTemp = alarm_program_get_temp_as_short(pSettings + 5);
+    int sLowTemp = alarm_program_get_temp_as_short(((uchar*)pSettings) + 5);
     
     if (sCurrentTemp > sHighTemp || sCurrentTemp < sLowTemp)
     {
-        Lcd_SetCursorPosition(1, 1);
+        Lcd_SetCursorPosition(6, 3);
         Lcd_WriteString("ALARM");
         PORTE = 0b001;
     }
     else
     {
-        Lcd_SetCursorPosition(1, 1);
+        Lcd_SetCursorPosition(6, 3);
         Lcd_WriteString("     ");
         PORTE = 0b000;
     }

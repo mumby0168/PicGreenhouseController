@@ -42,7 +42,7 @@ void main(void)
     
     while(1)
     {       
-        DelayMilliSeconds(150);
+        DelayMilliSeconds(75);
         Fst_Events event = Fst_Update();
         Fst_ProcessEvent(event);
         

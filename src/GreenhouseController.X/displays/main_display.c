@@ -36,12 +36,13 @@ static void main_display_render_time_and_temp()
     }
     
     // DAY & DATE
-    Lcd_SetCursorPosition(1, 4);
+    Lcd_SetCursorPosition(2, 4);
     Lcd_WriteString(days[g_clock.day - 1]);    
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.date);
     
     //Month and year
+    Lcd_WriteCharacter(' ');
     Lcd_WriteCharacter(' ');
     Lcd_WriteString(months[g_clock.month - 1]);
     Lcd_WriteCharacter(' ');
@@ -63,7 +64,7 @@ static void main_display_render_time_and_temp()
     Thermometer_BcdTemperature tempBcd;
     Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
     
-    Lcd_SetCursorPosition(1, 2);
+    Lcd_SetCursorPosition(5, 2);
     if (tempBcd.bIsNegative)
         Lcd_WriteCharacter('-');
     else

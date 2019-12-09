@@ -67,6 +67,19 @@ void Eeprom_Load()
         for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
             *p = 0;
         
+        //Load default settings
+        //cold settings
+        Eeprom_Settings.daytimeAlarmSettings.ubyColdAlarmTens = 1;
+        Eeprom_Settings.daytimeAlarmSettings.ubyColdAlarmUnits = 8;
+        Eeprom_Settings.nighttimeAlarmSettings.ubyColdAlarmTens = 1;
+        Eeprom_Settings.nighttimeAlarmSettings.ubyColdAlarmUnits = 4;
+        
+        //hot settings
+        Eeprom_Settings.daytimeAlarmSettings.ubyWarmAlarmTens = 2;
+        Eeprom_Settings.daytimeAlarmSettings.ubyWarmAlarmUnits = 4;
+        Eeprom_Settings.nighttimeAlarmSettings.ubyWarmAlarmTens = 2;
+        Eeprom_Settings.nighttimeAlarmSettings.ubyWarmAlarmUnits = 4;
+        
         Eeprom_Save();
     }
 }
