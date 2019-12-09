@@ -48,6 +48,22 @@ static void main_display_render_time_and_temp()
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.year);
        
+    if (Alarm_Program_IsCooling())
+    {
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("COOLING"); 
+    }
+    else if (Alarm_Program_IsHeating())
+    {
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("HEATING");
+    }
+    else
+    {
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("       ");
+    }
+    
     Thermometer_ScratchPad sp;
     if (Thermometer_ReadScratchPad(&sp, 2))
     {

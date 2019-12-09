@@ -12,6 +12,8 @@ typedef enum _alarm_program_programs
 void Alarm_Program_Init(void);
 void Alarm_Program_Update(void);
 Alarm_Program_Programs Alarm_Program_GetProgram(void);
+bool Alarm_Program_IsHeating(void);
+bool Alarm_Program_IsCooling(void);
 
 #endif
 

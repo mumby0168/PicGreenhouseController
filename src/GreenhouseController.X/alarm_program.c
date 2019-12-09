@@ -10,6 +10,18 @@
 static Alarm_Program_Programs s_CurrentProgram = ALARM_PROGRAM_DAY;
 static const unsigned short s_usDayProgramStartTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(6, 30);
 static const unsigned short s_usNightProgramStartTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(18, 30);
+static bool s_bIsHeating = false;
+static bool s_bIsCooling = false;
+
+bool Alarm_Program_IsHeating(void)
+{
+    return s_bIsHeating;
+}
+
+bool Alarm_Program_IsCooling(void)
+{
+    return s_bIsCooling;
+}
 
 void Alarm_Program_Init(void)
 {
@@ -44,6 +56,7 @@ void Alarm_Program_Update(void)
     else
     {
         s_CurrentProgram = ALARM_PROGRAM_NIGHT;
+        pSettings += 1;
     }
     
     Thermometer_ScratchPad sp;
@@ -54,16 +67,22 @@ void Alarm_Program_Update(void)
     int sHighTemp = alarm_program_get_temp_as_short(pSettings);
     int sLowTemp = alarm_program_get_temp_as_short(((uchar*)pSettings) + 5);
     
-    if (sCurrentTemp > sHighTemp || sCurrentTemp < sLowTemp)
+    if (sCurrentTemp > sHighTemp)
     {
-        Lcd_SetCursorPosition(6, 3);
-        Lcd_WriteString("ALARM");
-        PORTE = 0b001;
+        s_bIsCooling = true;
+        s_bIsHeating = false;
+        //PORTE = 0b001;
+    }
+    else if (sCurrentTemp < sLowTemp)
+    {
+        s_bIsHeating = true;
+        s_bIsCooling = false;
+        //PORTE = 0b001;
     }
     else
     {
-        Lcd_SetCursorPosition(6, 3);
-        Lcd_WriteString("     ");
+        s_bIsHeating = false;
+        s_bIsCooling = false;
         PORTE = 0b000;
     }
 }
