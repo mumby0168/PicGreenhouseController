@@ -23,17 +23,28 @@ void Matrix_CheckColumnState(uchar col)
     Matrix_usKeyState |= (nibble << (col * 4));
 }
 
+void Matrix_CheckColumns()
+{
+    for (uchar i = 0; i < 4; i++)
+    {
+        PORTC = 0x00;
+        SetBitHigh(&PORTC, 3 - i);
+        Matrix_usKeyState |= GetHighNibble(&PORTC) << (i * 4);
+    }
+}
+
 uchar Matrix_GetColumn(uchar col)
 {
-    uchar keySection = (Matrix_usKeyState >> (col * 4)) & 0x0F;
-    return keySection;
+    return (Matrix_usKeyState >> (col * 4)) & 0x0F;
 }
 
 bool Matrix_IsButtonPressed(uchar columnState, uchar button)
 {
-    bool isSet = columnState & (1 << button);
-    return isSet;    
+    return columnState & (1 << button);
 }
 
-
-
+void Matrix_GetColumns(uchar* ptr)
+{
+    for (uchar i = 0; i < 4; i++)
+        ptr[i] = (Matrix_usKeyState >> (i * 4)) & 0x0F;
+}

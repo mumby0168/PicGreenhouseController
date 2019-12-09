@@ -40,28 +40,6 @@ static void thermometer_write_byte(uchar val)
     TRISA0 = 1;
 }
 
-#define THERMOMETER_READ_BYTE(value)\
-value = 0;\
-for (char i = 0; i < 8; i++)\
-{\
-    RA0 = 0;\
-    TRISA0 = 0;\
-    NOP();\
-    NOP();\
-    NOP();\
-    NOP();\
-    NOP();\
-    NOP(); \
-    TRISA0 = 1;\
-    NOP();\
-    NOP();       \
-    NOP();        \
-    NOP();         \
-    NOP();          \
-    value |= RA0 << i; \
-    DELAY_MICRO_SECONDS(63);\
-}
-
 //SL:5
 static uchar thermometer_read_byte(void)
 {

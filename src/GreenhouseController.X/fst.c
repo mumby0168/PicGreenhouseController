@@ -155,10 +155,7 @@ Fst_Events Fst_Update(void)
 {
     Matrix_usKeyState = 0;
 
-    Matrix_CheckColumnState(0);
-    Matrix_CheckColumnState(1);
-    Matrix_CheckColumnState(2);
-    Matrix_CheckColumnState(3);
+    Matrix_CheckColumns();
 
     /*
      * COL ORDER AS LOOKING AT LCD:3 2 1 0      

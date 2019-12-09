@@ -8,6 +8,8 @@ const char* g_Warm = "WARM";
 const char* g_Day = "DAY";
 const char* g_Night = "NIGHT";
 
+void Display_Std_DrawBack();
+void Display_Std_DrawSave();
 
 
 #endif

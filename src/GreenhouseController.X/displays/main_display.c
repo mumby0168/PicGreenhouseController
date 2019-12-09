@@ -4,6 +4,8 @@
 #include "../drivers/lcd.h"
 #include "../fst.h"
 #include "../drivers/thermometer.h"
+#include "display-std.h"
+#include "../alarm_program.h"
 
 static char* days[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 static char* months[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
@@ -18,14 +20,26 @@ static void main_display_render_time_and_temp()
     Lcd_WriteCharacter(g_rawClock.minutesTens + 48);
     Lcd_WriteCharacter(g_rawClock.minutesDigits + 48);
 
+    if (Alarm_Program_GetProgram() == ALARM_PROGRAM_DAY)
+    {
+        Lcd_SetCursorPosition(13, 1);
+        Lcd_WriteString(g_Day);
+    }
+    else
+    {
+        Lcd_SetCursorPosition(11, 1);
+        Lcd_WriteString(g_Night);        
+    }
+    
+    
     // DAY & DATE
-    Lcd_SetCursorPosition(11, 1);
+    Lcd_SetCursorPosition(1, 4);
     Lcd_WriteString(days[g_clock.day - 1]);    
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.date);
     
     //Month and year
-    Lcd_SetCursorPosition(1, 4);
+    Lcd_WriteCharacter(' ');
     Lcd_WriteString(months[g_clock.month - 1]);
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.year);

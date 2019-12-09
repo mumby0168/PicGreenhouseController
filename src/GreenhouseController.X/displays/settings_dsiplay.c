@@ -5,21 +5,13 @@
 void Settings_Display(void)
 {
     Lcd_SetCursorPosition(4, 1);
-    Lcd_WriteCharacter('1');
-    Lcd_WriteCharacter(' ');
-    Lcd_WriteCharacter(' ');
-    Lcd_WriteString(g_Day);
+    Lcd_WriteString("1  DAY");
 
     Lcd_SetCursorPosition(4, 2);
-    Lcd_WriteCharacter('2');
-    Lcd_WriteCharacter(' ');
-    Lcd_WriteString(g_Night);
+    Lcd_WriteString("2 NIGHT");
 
     Lcd_SetCursorPosition(4, 3);
-    Lcd_WriteCharacter('3');
-    Lcd_WriteCharacter(' ');
-    Lcd_WriteString("CLOCK");
+    Lcd_WriteString("3 CLOCK");
 
-    Lcd_SetCursorPosition(1,4);
-    Lcd_WriteString(g_Back);   
+    Display_Std_DrawBack();
 }

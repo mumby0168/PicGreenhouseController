@@ -15,6 +15,7 @@
 #include "thermometer.h"
 #include "eeprom.h"
 #include "../fst.h"
+#include "../alarm_program.h"
 #define TMR2_VAL 11
 #define TMR2_TRIGGER_COUNT 12
 //begin config
@@ -33,6 +34,7 @@ void main(void)
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
     Eeprom_Load();
     Fst_Init();
+    Alarm_Program_Init();
     Thermometer_Init();
     Thermometer_ProcessTemperature();
 
@@ -45,8 +47,9 @@ void main(void)
         Fst_ProcessEvent(event);
         
         Thermometer_Update();        
-        if (Thermometer_bProcessTemperatureComplete)
+        if (Thermometer_bProcessTemperatureComplete) //Using an ~750ms interrupt...
         {
+            Alarm_Program_Update();
             Fst_ProcessEvent(FST_EVENT_PROCESS_TEMPERATURE_UPDATE);
             Thermometer_ProcessTemperature();
         }

@@ -42,6 +42,7 @@ uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig);
 uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBytesToRead);
 uchar Thermometer_CopyScratchPadToE2(void);
 uchar Thermometer_CopyE2ToScratchPad(void);
+bool Thermometer_IsAlarming(void);
 float Thermometer_ConvertTempratureToFloat(uchar ubyTempMsb, uchar ubyTempLsb);
 void Thermometer_ConvertTempratureToBcd(uchar ubyTempMsb, uchar ubyTempLsb, Thermometer_BcdTemperature* pBcdTemperature);
 

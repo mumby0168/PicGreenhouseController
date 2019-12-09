@@ -109,9 +109,6 @@ void Date_Set_Display(void)
     
     date_set_display_render_date();
     
-    Lcd_SetCursorPosition(1,4);
-    Lcd_WriteString(g_Back);
-
-    Lcd_SetCursorPosition(12,4);
-    Lcd_WriteString(g_Save);
+    Display_Std_DrawBack();
+    Display_Std_DrawSave();
 }
