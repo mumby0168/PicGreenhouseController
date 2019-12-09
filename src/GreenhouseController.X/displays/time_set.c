@@ -10,6 +10,18 @@ static RawClock s_TimeSet;
 static uchar s_ubyDigitPosition = 0;
 static uchar s_aubyTimeLimits[6] = { 2, 9, 5, 9, 5, 9 };
 
+static void time_set_display_draw_carrot(void)
+{
+    Lcd_SetCursorPosition(5, 3);
+    Lcd_WriteString("        ");
+    
+    uchar ubyOffset = 5 + s_ubyDigitPosition;
+    ubyOffset += s_ubyDigitPosition / 2;
+    
+    Lcd_SetCursorPosition(ubyOffset, 3);
+    Lcd_WriteCharacter('^');
+}
+
 static void time_set_display_render_time(void)
 {
     Lcd_SetCursorPosition(5, 2);
@@ -87,8 +99,7 @@ static void time_set_display_left_arrow(void)
     }
     
     time_set_update_time_limits();
-//    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
-//    Lcd_WriteCharacter('^');
+    time_set_display_draw_carrot();
 }
 
 static void time_set_display_right_arrow(void)
@@ -99,8 +110,7 @@ static void time_set_display_right_arrow(void)
     }
     
     time_set_update_time_limits();
-//    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
-//    Lcd_WriteCharacter('^');
+    time_set_display_draw_carrot();
 }
 
 static void time_set_display_save(void)
@@ -132,4 +142,5 @@ void Time_Set_Display(void)
     
     Display_Std_DrawBack();
     Display_Std_DrawSave();
+    time_set_display_draw_carrot();
 }

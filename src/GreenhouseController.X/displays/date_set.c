@@ -16,6 +16,18 @@ static DateSet s_DateSet;
 static uchar s_ubyDigitPosition = 0;
 static uchar s_aubyDateLimits[3] = { 31, 12, 99 };
 
+static void date_set_display_draw_carrot(void)
+{
+    Lcd_SetCursorPosition(5, 3);
+    Lcd_WriteString("        ");
+    
+    uchar ubyOffset = 5 + (s_ubyDigitPosition * 2);
+    ubyOffset += s_ubyDigitPosition;
+    
+    Lcd_SetCursorPosition(ubyOffset, 3);
+    Lcd_WriteString("^^");
+}
+
 static void date_set_update_limits()
 {
     s_aubyDateLimits[0] = g_aubyDaysInMonths[s_DateSet.month - 1];
@@ -79,8 +91,7 @@ static void date_set_display_left_arrow(void)
     }
     
     date_set_update_limits();
-//    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
-//    Lcd_WriteCharacter('^');
+    date_set_display_draw_carrot();
 }
 
 static void date_set_display_right_arrow(void)
@@ -91,8 +102,7 @@ static void date_set_display_right_arrow(void)
     }
     
     date_set_update_limits();
-//    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
-//    Lcd_WriteCharacter('^');
+    date_set_display_draw_carrot();
 }
 
 static void date_set_display_save(void)
@@ -123,4 +133,5 @@ void Date_Set_Display(void)
     
     Display_Std_DrawBack();
     Display_Std_DrawSave();
+    date_set_display_draw_carrot();
 }

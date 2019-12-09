@@ -60,6 +60,20 @@ static void temp_set_display_load_night_settings()
     s_IsDay = false;
 }
 
+static void temp_set_display_draw_carrot(void)
+{
+    uchar ubyOffset = 5 + s_ubySelectedDigit;
+    Lcd_SetCursorPosition(5, 3);
+    Lcd_WriteString("       ");
+    
+    if (s_ubySelectedDigit == 4)
+        ubyOffset++;
+    
+    Lcd_SetCursorPosition(ubyOffset, 3);
+    
+    Lcd_WriteCharacter('^');
+}
+
 void Temp_Set_Display_Init(void)
 {
     Fst_SetAction(FST_ACTION_COLD_SETTINGS, &temp_set_display_select_cold_settings);
@@ -120,8 +134,7 @@ static void temp_set_display_left_arrow()
     else
         s_ubySelectedDigit -= 1;
     
-//    Lcd_SetCursorPosition(5 + s_ubySelectedDigit, 2);
-//    Lcd_WriteCharacter('^');
+    temp_set_display_draw_carrot();
 }
 
 static void temp_set_display_right_arrow()
@@ -129,8 +142,7 @@ static void temp_set_display_right_arrow()
     if (++s_ubySelectedDigit > 4)
         s_ubySelectedDigit = 0;
     
-//    Lcd_SetCursorPosition(5 + s_ubySelectedDigit, 2);
-//    Lcd_WriteCharacter('^');
+    temp_set_display_draw_carrot();
 }
 
 static void temp_set_display_save()
@@ -194,4 +206,5 @@ void Temp_Set_Display(void)
     
     Display_Std_DrawBack();
     Display_Std_DrawSave();
+    temp_set_display_draw_carrot();
 }
