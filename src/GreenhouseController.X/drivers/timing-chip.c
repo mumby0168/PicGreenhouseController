@@ -7,7 +7,6 @@
 #include "../libs/BinaryUtillities.h"
 #include <xc.h>
 #include "../libs/std.h"
-#include "../drivers/lcd.h"
 
 
 /**************************Defines*****************************/
@@ -120,11 +119,7 @@ void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year)
 }
 
 void Timing_SetTime(uchar hours, uchar minutes, uchar seconds)
-{
-
-    Lcd_SetCursorPosition(2,5);
-    Lcd_WriteNumber(hours);
-
+{    
     WriteCommandByte(WRITE_HOURS);
     WriteHours(hours);
     COMPLETE_OPERATION
