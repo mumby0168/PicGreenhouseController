@@ -37,7 +37,7 @@ void main(void)
     Alarm_Program_Init();
     Thermometer_Init();
     Thermometer_ProcessTemperature();
-
+    
     Fst_ProcessEvent(FST_EVENT_INITIALISED);
     
     while(1)

@@ -334,7 +334,7 @@ static void ReadMinutes()
 
 static void ReadHours()
 {
-    //TODO: double check assumptions made here based of bit defitions from the datasheet.   
+    //TODO: double check assumptions made here based of bit definitions from the datasheet.   
     uchar temp = AssembleByte();    
     uchar digits = (temp & 0x0F);
     //assume 1 means 24 hr clock i.e. after 12am.
@@ -344,7 +344,7 @@ static void ReadHours()
 
     g_rawClock.hoursDigits = digits;
     g_rawClock.hoursTens = tens;
-    g_clock.minutes = (tens * 10) + digits;
+    g_clock.hours = (tens * 10) + digits;
 }
 
 static void ReadDate()

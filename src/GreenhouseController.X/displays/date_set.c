@@ -37,7 +37,6 @@ static void date_set_display_render_date()
 
 static void date_set_display_up_arrow(void)
 {
-    date_set_update_limits();
     uchar* pDigit = &s_DateSet;
     pDigit += s_ubyDigitPosition;
     
@@ -47,11 +46,11 @@ static void date_set_display_up_arrow(void)
     }
     
     date_set_display_render_date();
+    date_set_update_limits();
 }
 
 static void date_set_display_down_arrow(void)
 {
-    date_set_update_limits();
     uchar* pDigit = &s_DateSet;
     pDigit += s_ubyDigitPosition;
     
@@ -65,6 +64,7 @@ static void date_set_display_down_arrow(void)
     }
     
     date_set_display_render_date();
+    date_set_update_limits();
 }
 
 static void date_set_display_left_arrow(void)
@@ -78,6 +78,7 @@ static void date_set_display_left_arrow(void)
         s_ubyDigitPosition--;
     }
     
+    date_set_update_limits();
 //    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
 //    Lcd_WriteCharacter('^');
 }
@@ -89,6 +90,7 @@ static void date_set_display_right_arrow(void)
         s_ubyDigitPosition = 0;
     }
     
+    date_set_update_limits();
 //    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
 //    Lcd_WriteCharacter('^');
 }
@@ -106,6 +108,7 @@ static void date_set_display_save(void)
 
 void Date_Set_Display(void)
 {
+    s_ubyDigitPosition = 0;
     Timing_ReadTime();
     uchar* pClock = &g_clock;
     memcpy(&s_DateSet, pClock + (sizeof(Clock) - sizeof(DateSet)), sizeof(DateSet));

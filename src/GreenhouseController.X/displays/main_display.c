@@ -14,7 +14,7 @@ static bool s_bPrevDrawHadError = false;
 static void main_display_render_time_and_temp()
 {
     //TIME
-    Lcd_SetCursorPosition(1, 1);\
+    Lcd_SetCursorPosition(1, 1);
     Lcd_WriteCharacter(g_rawClock.hoursTens + 48);
     Lcd_WriteCharacter(g_rawClock.hoursDigits + 48);
     Lcd_WriteCharacter(':'); 
@@ -26,15 +26,14 @@ static void main_display_render_time_and_temp()
     
     if (Alarm_Program_GetProgram() == ALARM_PROGRAM_DAY)
     {
-        Lcd_SetCursorPosition(14, 1);
-        Lcd_WriteString(g_Day);
+        Lcd_SetCursorPosition(12, 1);
+        Lcd_WriteString("  DAY");
     }
     else
     {
         Lcd_SetCursorPosition(12, 1);
-        Lcd_WriteString(g_Night);        
+        Lcd_WriteString("NIGHT");        
     }
-    
     
     // DAY & DATE
     Lcd_SetCursorPosition(1, 4);
@@ -75,9 +74,6 @@ static void main_display_render_time_and_temp()
     Lcd_WriteCharacter(tempBcd.ubyUnits + 48);
     Lcd_WriteCharacter('.');
     Lcd_WriteCharacter(tempBcd.ubyTenths + 48);
-    Lcd_WriteCharacter(tempBcd.ubyHundredths + 48);
-    Lcd_WriteCharacter(tempBcd.ubyThousandths + 48);
-    Lcd_WriteCharacter(tempBcd.ubyTenThousandths + 48);
     Lcd_WriteCharacter('C');
 }
 

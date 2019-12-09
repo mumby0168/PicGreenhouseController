@@ -10,18 +10,6 @@ static RawClock s_TimeSet;
 static uchar s_ubyDigitPosition = 0;
 static uchar s_aubyTimeLimits[6] = { 2, 9, 5, 9, 5, 9 };
 
-static void time_set_update_time_limits()
-{
-    if (s_TimeSet.hoursTens == 2)
-    {
-        s_aubyTimeLimits[1] = 4;
-    }
-    else
-    {
-        s_aubyTimeLimits[1] = 9;
-    }
-}
-
 static void time_set_display_render_time(void)
 {
     Lcd_SetCursorPosition(5, 2);
@@ -37,9 +25,26 @@ static void time_set_display_render_time(void)
     Lcd_WriteCharacter(s_TimeSet.secondsDigits + 48);
 }
 
+static void time_set_update_time_limits()
+{
+    if (s_TimeSet.hoursTens == 2)
+    {
+        s_aubyTimeLimits[1] = 3;
+        if (s_TimeSet.hoursDigits > s_aubyTimeLimits[1])
+        {
+            s_TimeSet.hoursDigits = s_aubyTimeLimits[1];
+        }
+    }
+    else
+    {
+        s_aubyTimeLimits[1] = 9;
+    }
+    
+    time_set_display_render_time();
+}
+
 static void time_set_display_up_arrow(void)
 {
-    time_set_update_time_limits();
     uchar* pDigit = &s_TimeSet;
     pDigit += s_ubyDigitPosition;
     
@@ -49,11 +54,11 @@ static void time_set_display_up_arrow(void)
     }
     
     time_set_display_render_time();
+    time_set_update_time_limits();
 }
 
 static void time_set_display_down_arrow(void)
 {
-    time_set_update_time_limits();
     uchar* pDigit = &s_TimeSet;
     pDigit += s_ubyDigitPosition;
     
@@ -67,6 +72,7 @@ static void time_set_display_down_arrow(void)
     }
     
     time_set_display_render_time();
+    time_set_update_time_limits();
 }
 
 static void time_set_display_left_arrow(void)
@@ -80,6 +86,7 @@ static void time_set_display_left_arrow(void)
         s_ubyDigitPosition--;
     }
     
+    time_set_update_time_limits();
 //    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
 //    Lcd_WriteCharacter('^');
 }
@@ -91,6 +98,7 @@ static void time_set_display_right_arrow(void)
         s_ubyDigitPosition = 0;
     }
     
+    time_set_update_time_limits();
 //    Lcd_SetCursorPosition(5 + s_ubyDigitPosition, 3);
 //    Lcd_WriteCharacter('^');
 }
@@ -110,6 +118,7 @@ static void time_set_display_save(void)
 
 void Time_Set_Display(void)
 {
+    s_ubyDigitPosition = 0;
     Timing_ReadTime();
     memcpy(&s_TimeSet, &g_rawClock, sizeof(RawClock));
 
