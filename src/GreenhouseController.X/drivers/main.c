@@ -39,7 +39,7 @@ void main(void)
     Thermometer_ProcessTemperature();
 
     Fst_ProcessEvent(FST_EVENT_INITIALISED);
-
+    
     while(1)
     {       
         DelayMilliSeconds(150);

@@ -9,25 +9,29 @@
 
 static char* days[] = {"MON", "TUE", "WED", "THU", "FRI", "SAT", "SUN"};
 static char* months[] = {"JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"};
+static bool s_bPrevDrawHadError = false;
 
 static void main_display_render_time_and_temp()
 {
     //TIME
     Lcd_SetCursorPosition(1, 1);\
-    Lcd_WriteCharacter(g_rawClock.hoursTens + 48);\
+    Lcd_WriteCharacter(g_rawClock.hoursTens + 48);
     Lcd_WriteCharacter(g_rawClock.hoursDigits + 48);
-    Lcd_WriteCharacter(58); // :
+    Lcd_WriteCharacter(':'); 
     Lcd_WriteCharacter(g_rawClock.minutesTens + 48);
     Lcd_WriteCharacter(g_rawClock.minutesDigits + 48);
-
+    Lcd_WriteCharacter(':'); 
+    Lcd_WriteCharacter(g_rawClock.secondsTens + 48);
+    Lcd_WriteCharacter(g_rawClock.secondsDigits + 48);
+    
     if (Alarm_Program_GetProgram() == ALARM_PROGRAM_DAY)
     {
-        Lcd_SetCursorPosition(13, 1);
+        Lcd_SetCursorPosition(14, 1);
         Lcd_WriteString(g_Day);
     }
     else
     {
-        Lcd_SetCursorPosition(11, 1);
+        Lcd_SetCursorPosition(12, 1);
         Lcd_WriteString(g_Night);        
     }
     
@@ -43,13 +47,19 @@ static void main_display_render_time_and_temp()
     Lcd_WriteString(months[g_clock.month - 1]);
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(g_clock.year);
-    
+       
     Thermometer_ScratchPad sp;
     if (Thermometer_ReadScratchPad(&sp, 2))
     {
         Lcd_SetCursorPosition(1, 2);
         Lcd_WriteString("Cannot read thermometer.");
+        s_bPrevDrawHadError = true;
         return;
+    }
+    else if (s_bPrevDrawHadError)
+    {
+        Lcd_SetCursorPosition(1, 2);
+        Lcd_WriteString("                        ");
     }
     Thermometer_BcdTemperature tempBcd;
     Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);

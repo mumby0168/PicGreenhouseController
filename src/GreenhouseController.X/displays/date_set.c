@@ -7,19 +7,26 @@
 
 typedef struct _date_set
 {
-    uchar day;
+    uchar date;
     uchar month;
     uchar year;
 } DateSet;
 
 static DateSet s_DateSet;
 static uchar s_ubyDigitPosition = 0;
-static uchar s_aubyDateLimits[6] = { 31, 12, 99 };
+static uchar s_aubyDateLimits[3] = { 31, 12, 99 };
+
+static void date_set_update_limits()
+{
+    s_aubyDateLimits[0] = g_aubyDaysInMonths[s_DateSet.month - 1];
+    if (Timing_IsLeapYear(s_DateSet.year) && s_DateSet.month == 2)
+        s_aubyDateLimits[0] += 1;
+}
 
 static void date_set_display_render_date()
 {
     Lcd_SetCursorPosition(5, 2);
-    Lcd_WriteNumber(s_DateSet.day);    
+    Lcd_WriteNumber(s_DateSet.date);    
     Lcd_WriteCharacter('/');
     
     Lcd_WriteNumber(s_DateSet.month);   
@@ -30,12 +37,13 @@ static void date_set_display_render_date()
 
 static void date_set_display_up_arrow(void)
 {
+    date_set_update_limits();
     uchar* pDigit = &s_DateSet;
     pDigit += s_ubyDigitPosition;
     
     if (++(*pDigit) > s_aubyDateLimits[s_ubyDigitPosition])
     {
-        *pDigit = 0;
+        *pDigit = 1;
     }
     
     date_set_display_render_date();
@@ -43,6 +51,7 @@ static void date_set_display_up_arrow(void)
 
 static void date_set_display_down_arrow(void)
 {
+    date_set_update_limits();
     uchar* pDigit = &s_DateSet;
     pDigit += s_ubyDigitPosition;
     
@@ -62,7 +71,7 @@ static void date_set_display_left_arrow(void)
 {
     if (s_ubyDigitPosition == 0)
     {
-        s_ubyDigitPosition = 5;
+        s_ubyDigitPosition = 2;
     }
     else
     {
@@ -75,7 +84,7 @@ static void date_set_display_left_arrow(void)
 
 static void date_set_display_right_arrow(void)
 {
-    if (++s_ubyDigitPosition > 5)
+    if (++s_ubyDigitPosition > 2)
     {
         s_ubyDigitPosition = 0;
     }
@@ -86,7 +95,7 @@ static void date_set_display_right_arrow(void)
 
 static void date_set_display_save(void)
 {
-    Timing_SetCalendar(Timing_GetDayFromDate(s_DateSet.day, s_DateSet.month, s_DateSet.year), s_DateSet.day, s_DateSet.month, s_DateSet.year);
+    Timing_SetCalendar(Timing_GetDayFromDate(s_DateSet.date, s_DateSet.month, s_DateSet.year), s_DateSet.date, s_DateSet.month, s_DateSet.year);
     
     Lcd_ClearDisplay();
     Lcd_SetCursorPosition(1, 1);

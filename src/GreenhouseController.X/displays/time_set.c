@@ -10,6 +10,18 @@ static RawClock s_TimeSet;
 static uchar s_ubyDigitPosition = 0;
 static uchar s_aubyTimeLimits[6] = { 2, 9, 5, 9, 5, 9 };
 
+static void time_set_update_time_limits()
+{
+    if (s_TimeSet.hoursTens == 2)
+    {
+        s_aubyTimeLimits[1] = 4;
+    }
+    else
+    {
+        s_aubyTimeLimits[1] = 9;
+    }
+}
+
 static void time_set_display_render_time(void)
 {
     Lcd_SetCursorPosition(5, 2);
@@ -27,6 +39,7 @@ static void time_set_display_render_time(void)
 
 static void time_set_display_up_arrow(void)
 {
+    time_set_update_time_limits();
     uchar* pDigit = &s_TimeSet;
     pDigit += s_ubyDigitPosition;
     
@@ -40,6 +53,7 @@ static void time_set_display_up_arrow(void)
 
 static void time_set_display_down_arrow(void)
 {
+    time_set_update_time_limits();
     uchar* pDigit = &s_TimeSet;
     pDigit += s_ubyDigitPosition;
     
