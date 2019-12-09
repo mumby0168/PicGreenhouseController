@@ -269,15 +269,10 @@ static void WriteHours(uchar hours)
     
     uchar digits = hours % 10;    
     encoded = digits;    
-    if(hours > 12) 
-    {
-        SetBitHigh(&encoded, 7);        
-    }
-        
-    if(hours > 9)
-    {
-        SetBitHigh(&encoded, 4);  
-    }
+
+    encoded |= (tens << 4);
+
+    SetBitHigh(&encoded, 7);            
     
     WriteByte(&encoded);
 }
@@ -345,12 +340,7 @@ static void ReadHours()
     //assume 1 means 24 hr clock i.e. after 12am.
     uchar tens = 0;
 
-    tens = IsBitSet(&temp, 4);
-
-    if(IsBitSet(&temp, 7))
-    {
-        tens++;
-    }    
+    tens = (temp & 0x30) >> 4;     
 
     g_rawClock.hoursDigits = digits;
     g_rawClock.hoursTens = tens;
