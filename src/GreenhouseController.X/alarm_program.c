@@ -12,6 +12,7 @@ static const unsigned short s_usDayProgramStartTimeInMins = CONVERT_HOURS_AND_MI
 static const unsigned short s_usNightProgramStartTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(18, 30);
 static bool s_bIsHeating = false;
 static bool s_bIsCooling = false;
+static short s_sPrevTemp = 0;
 
 bool Alarm_Program_IsHeating(void)
 {
@@ -72,12 +73,29 @@ void Alarm_Program_Update(void)
         s_bIsCooling = true;
         s_bIsHeating = false;
         //PORTE = 0b001;
+        
+        if (s_sPrevTemp - sCurrentTemp < 0) //if the vector from current to prev is negative or the same then it is not cooling so sound alarm
+        {
+            PORTE = 0b001;
+        }
+        else
+        {
+            PORTE = 0b000;
+        }
     }
     else if (sCurrentTemp < sLowTemp)
     {
         s_bIsHeating = true;
         s_bIsCooling = false;
-        //PORTE = 0b001;
+        
+        if (s_sPrevTemp - sCurrentTemp > 0) //if the vector from current to prev is positive or the same then it is not warming so sound alarm
+        {
+            PORTE = 0b001;
+        }
+        else
+        {
+            PORTE = 0b000;
+        }
     }
     else
     {
@@ -85,6 +103,8 @@ void Alarm_Program_Update(void)
         s_bIsCooling = false;
         PORTE = 0b000;
     }
+    
+    s_sPrevTemp = sCurrentTemp;
 }
 
 Alarm_Program_Programs Alarm_Program_GetProgram(void)
