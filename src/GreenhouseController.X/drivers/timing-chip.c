@@ -100,7 +100,7 @@ void Timing_Init()
 }
 
 void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year)
-{
+{    
     WriteCommandByte(WRITE_DAY);
     WriteDay(day);
     COMPLETE_OPERATION
@@ -119,7 +119,7 @@ void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year)
 }
 
 void Timing_SetTime(uchar hours, uchar minutes, uchar seconds)
-{
+{    
     WriteCommandByte(WRITE_HOURS);
     WriteHours(hours);
     COMPLETE_OPERATION
@@ -270,9 +270,7 @@ static void WriteHours(uchar hours)
     uchar digits = hours % 10;    
     encoded = digits;    
 
-    encoded |= (tens << 4);
-
-    SetBitHigh(&encoded, 7);            
+    encoded |= (tens << 4);    
     
     WriteByte(&encoded);
 }
@@ -341,6 +339,8 @@ static void ReadHours()
     uchar tens = 0;
 
     tens = (temp & 0x30) >> 4;     
+
+    
 
     g_rawClock.hoursDigits = digits;
     g_rawClock.hoursTens = tens;
