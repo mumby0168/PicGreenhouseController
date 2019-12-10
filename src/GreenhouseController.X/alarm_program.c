@@ -4,6 +4,7 @@
 #include "drivers/thermometer.h"
 #include "drivers/eeprom.h"
 #include "drivers/lcd.h"
+#include "fst.h"
 
 #define CONVERT_HOURS_AND_MINS_TO_MINS(h, m) (h * 60) + m
 
@@ -13,6 +14,17 @@ static const unsigned short s_usNightProgramStartTimeInMins = CONVERT_HOURS_AND_
 static bool s_bIsHeating = false;
 static bool s_bIsCooling = false;
 static short s_sPrevTemp = 0;
+static bool s_bIsAlarming = false;
+static bool s_bIsSilenced = false;
+
+static void alarm_program_silence(void)
+{
+    if (s_bIsAlarming)
+    {
+        PORTE = 0b000;   
+        s_bIsSilenced = true;
+    }
+}
 
 bool Alarm_Program_IsHeating(void)
 {
@@ -32,6 +44,8 @@ void Alarm_Program_Init(void)
     TRISB7 = 0;
     RB6 = 0;
     RB7 = 0;
+    
+    Fst_SetAction(FST_ACTION_SILENCE_ALARM, &alarm_program_silence);
     
     Alarm_Program_Update();
 }
@@ -72,13 +86,15 @@ void Alarm_Program_Update(void)
         RB6 = 0;
         RB7 = 1;
         
-        if (s_sPrevTemp - sCurrentTemp < 0) //if the vector from current to prev is negative or the same then it is not cooling so sound alarm
+        if (s_sPrevTemp - sCurrentTemp < 0 && !s_bIsSilenced) //if the vector from current to prev is negative or the same then it is not cooling so sound alarm
         {
             PORTE = 0b001;
+            s_bIsAlarming = true;
         }
         else
         {
             PORTE = 0b000;
+            s_bIsAlarming = false;
         }
     }
     else if (sCurrentTemp < sLowTemp)
@@ -88,13 +104,15 @@ void Alarm_Program_Update(void)
         RB6 = 1;
         RB7 = 0;
         
-        if (s_sPrevTemp - sCurrentTemp > 0) //if the vector from current to prev is positive or the same then it is not warming so sound alarm
+        if (s_sPrevTemp - sCurrentTemp > 0 && !s_bIsSilenced) //if the vector from current to prev is positive or the same then it is not warming so sound alarm
         {
             PORTE = 0b001;
+            s_bIsAlarming = true;
         }
         else
         {
             PORTE = 0b000;
+            s_bIsAlarming = false;
         }
     }
     else
@@ -103,6 +121,7 @@ void Alarm_Program_Update(void)
         s_bIsCooling = false;
         RB6 = 0;
         RB7 = 0;
+        s_bIsSilenced = false;
         PORTE = 0b000;
     }
     

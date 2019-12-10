@@ -15,22 +15,23 @@
 
 static Fst_States s_FstState;
 #define FST_NUMBER_OF_STATES 8
-#define FST_NUMBER_OF_EVENTS 12
-#define FST_NUMBER_OF_ACTIONS 11
+#define FST_NUMBER_OF_EVENTS 13
+#define FST_NUMBER_OF_ACTIONS 12
 
 /*
-STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9           10              11                  ACTION
-EVENT		        BACK	SAVE	MENU1	MENU2	MENU3	LEFT	RIGHT	UP	DOWN	SETTINGS    INITIALISED     TEMP_UPDATED        0	DO NOTHING
-0	INITIALISE	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	-/0	    -/0		    -/0             -/0                 1	LOAD DAY TIME SETTINGS
-1	MAIN	        -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	-/0	    2/0		    -/0             1/9                 2	LOAD NIGHT TIME SETTINGS
-2	SETTINGS	    1/0	    2/0	    4/1	    4/2	    3/0	    -/0	    -/0	    -/0	-/0	    1/0		    -/0             -/0                 3	LOAD HOT SETTINGS
-3	CLOCK SETTINGS	2/0	    3/0	    6/0	    7/0	    -/0	    -/0	    -/0	    -/0	-/0	    -/0		    -/0             -/0                 4	LOAD COLD SETTINGS
-4	TRIGGER OPTIONS	2/0	    4/0	    5/3	    5/4	    -/0	    -/0	    -/0	    -/0	-/0	    -/0		    -/0             -/0                 5	MOVE CURSOR LEFT
-5	TEMP ALARM SET	4/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0                 6	MOVE CURSOR RIGHT
-6	TIME SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0                 7	INCREMENT DIGIT
-7	DATE SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0                 8	DECREMENT DIGIT
-                                                                                                                                        9   REDRAW TEMP
- *                                                                                                                                      A   save
+STATE	            0	    1	    2	    3	    4	    5	    6	    7	8	    9           10              11              12                  ACTION
+EVENT		        BACK	SAVE	MENU1	MENU2	MENU3	LEFT	RIGHT	UP	DOWN	SETTINGS    INITIALISED     TEMP_UPDATED    MIDDLE               0	DO NOTHING
+0	INITIALISE	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	-/0	    -/0		    -/0             -/0             -/0                  1	LOAD DAY TIME SETTINGS
+1	MAIN	        -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	    -/0	-/0	    2/0		    -/0             1/9             -/B                  2	LOAD NIGHT TIME SETTINGS
+2	SETTINGS	    1/0	    2/0	    4/1	    4/2	    3/0	    -/0	    -/0	    -/0	-/0	    1/0		    -/0             -/0             -/B                  3	LOAD HOT SETTINGS
+3	CLOCK SETTINGS	2/0	    3/0	    6/0	    7/0	    -/0	    -/0	    -/0	    -/0	-/0	    -/0		    -/0             -/0             -/B                  4	LOAD COLD SETTINGS
+4	TRIGGER OPTIONS	2/0	    4/0	    5/3	    5/4	    -/0	    -/0	    -/0	    -/0	-/0	    -/0		    -/0             -/0             -/B                  5	MOVE CURSOR LEFT
+5	TEMP ALARM SET	4/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0             -/B                  6	MOVE CURSOR RIGHT
+6	TIME SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0             -/B                  7	INCREMENT DIGIT
+7	DATE SET	    3/0	    1/0	    -/0	    -/0	    -/0	    -/5	    -/6	    -/7	-/8	    -/0		    -/0             -/0             -/B                  8	DECREMENT DIGIT
+                                                                                                                                                         9  REDRAW TEMP
+ *                                                                                                                                                       A  save
+ *                                                                                                                                                       B  SILENCE
 STATE/ACTION													
 - MEANS REMAIN IN SAME STATE. So the table below sets it the the current state
 1/2 -> 0x12												
@@ -39,23 +40,23 @@ STATE/ACTION
 static Fst_ActionDelegate s_FstActions[FST_NUMBER_OF_ACTIONS] = {nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr};
 
 static const uchar s_ubyFstTable[FST_NUMBER_OF_STATES][FST_NUMBER_OF_EVENTS] ={
-    /* BACK	SAVE  MENU1	MENU2 MENU3	LEFT  RIGHT	UP	  DOWN	SET   INIT  TEMP_UPDATED   */
+    /* BACK	SAVE  MENU1	MENU2 MENU3	LEFT  RIGHT	UP	  DOWN	SET   INIT  TEMP  MIDDLE*/
     /* 0 INITIALISE */
-    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00 },
+    { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x10, 0x00, 0x0B },
     /* 1 MAIN */
-    { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20, 0x10, 0x19 },
+    { 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x20, 0x10, 0x19, 0x1B },
     /* 2 SETTINGS */
-    { 0x10, 0x20, 0x41, 0x42, 0x30, 0x20, 0x20, 0x20, 0x20, 0x10, 0x20, 0x20 },
+    { 0x10, 0x20, 0x41, 0x42, 0x30, 0x20, 0x20, 0x20, 0x20, 0x10, 0x20, 0x20, 0x2B },
     /* 3 CLOCK SETTINGS */
-    { 0x20, 0x30, 0x60, 0x70, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30 },
+    { 0x20, 0x30, 0x60, 0x70, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x30, 0x3B },
     /* 4 TRIGGER OPTS */
-    { 0x20, 0x40, 0x54, 0x53, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40 },
+    { 0x20, 0x40, 0x54, 0x53, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x40, 0x4B },
     /* 5 TEMP ALARM SET */
-    { 0x40, 0x1A, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50 },
+    { 0x40, 0x1A, 0x50, 0x50, 0x50, 0x55, 0x56, 0x57, 0x58, 0x50, 0x50, 0x50, 0x5B },
     /* 6 TIME SET */
-    { 0x30, 0x1A, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60 },
+    { 0x30, 0x1A, 0x60, 0x60, 0x60, 0x65, 0x66, 0x67, 0x68, 0x60, 0x60, 0x60, 0x6B },
     /* 7 DATE SET */
-    { 0x30, 0x1A, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70 }
+    { 0x30, 0x1A, 0x70, 0x70, 0x70, 0x75, 0x76, 0x77, 0x78, 0x70, 0x70, 0x70, 0x7B }
 };
 
 void Fst_Init(void) 
@@ -197,6 +198,10 @@ Fst_Events Fst_Update(void)
     } else if (col1State == 1) // BACK
     {
         return (FST_EVENT_SAVE_BUTTON);
+    }
+    else if (col2State == 4)
+    {
+        return (FST_EVENT_MIDDLE_BUTTON);
     }
     
     return FST_EVENT_NO_EVENT;

@@ -16,6 +16,7 @@ typedef enum fstEvents
     FST_EVENT_SETTINGS_BUTTON = 9,
     FST_EVENT_INITIALISED = 10,
     FST_EVENT_PROCESS_TEMPERATURE_UPDATE = 11,
+    FST_EVENT_MIDDLE_BUTTON = 12,
     FST_EVENT_NO_EVENT = 0xFF
 } Fst_Events;
 
@@ -43,7 +44,8 @@ typedef enum fstActions
     FST_ACTION_HANDLE_UP_BUTTON = 7,
     FST_ACTION_HANDLE_DOWN_BUTTON = 8,
     FST_ACTION_REDRAW_TEMPERATURE = 9,
-    FST_ACTION_SAVE = 10
+    FST_ACTION_SAVE = 10,
+    FST_ACTION_SILENCE_ALARM = 11
 } Fst_Actions;
 
 typedef void (*Fst_ActionDelegate)();

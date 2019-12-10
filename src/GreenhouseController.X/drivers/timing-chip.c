@@ -48,8 +48,8 @@
 #define COMPLETE_OPERATION RST = 0;
 
 //Structures
-static RawClock rawClock;
-static Clock clock;
+static RawClock s_rawClock;
+static Clock s_clock;
 
 //Write Operations
 static void write_date(uchar data);
@@ -81,12 +81,12 @@ static void write_byte(uchar *);
 
 void Timing_ReadRawClock(RawClock *pRawClock)
 {
-    pRawClock = (RawClock *)&rawClock;
+    memcpy(pRawClock, &s_rawClock, sizeof(RawClock));
 }
 
 void Timing_ReadClock(Clock *pClock)
 {
-    pClock = (Clock *)&clock;
+    memcpy(pClock, &s_clock, sizeof(Clock));
 }
 
 void Timing_Init()
@@ -324,9 +324,9 @@ static void read_seconds()
     uchar temp = assemble_byte();
     uchar tens = (temp & 0x70) >> 4;
     uchar digits = (temp & 0x0F);
-    rawClock.ucSecondsDigits = digits;
-    rawClock.ucSecondsTens = tens;
-    clock.ucSeconds = (tens * 10) + digits;
+    s_rawClock.ucSecondsDigits = digits;
+    s_rawClock.ucSecondsTens = tens;
+    s_clock.ucSeconds = (tens * 10) + digits;
 }
 
 static void read_minutes()
@@ -334,9 +334,9 @@ static void read_minutes()
     uchar temp = assemble_byte();
     uchar tens = (temp & 0x70) >> 4;
     uchar digits = (temp & 0x0F);
-    rawClock.ucMinutesDigits = digits;
-    rawClock.ucMinutesTens = tens;
-    clock.ucMinutes = (tens * 10) + digits;
+    s_rawClock.ucMinutesDigits = digits;
+    s_rawClock.ucMinutesTens = tens;
+    s_clock.ucMinutes = (tens * 10) + digits;
 }
 
 static void read_hours()
@@ -345,9 +345,9 @@ static void read_hours()
     uchar digits = (temp & 0x0F);        
     uchar tens = (temp & 0x30) >> 4;    
 
-    rawClock.ucHoursDigits = digits;
-    rawClock.ucHoursTens = tens;
-    clock.ucHours = (tens * 10) + digits;
+    s_rawClock.ucHoursDigits = digits;
+    s_rawClock.ucHoursTens = tens;
+    s_clock.ucHours = (tens * 10) + digits;
 }
 
 static void read_date()
@@ -355,7 +355,7 @@ static void read_date()
     uchar temp = assemble_byte();
     uchar tens = (temp & 0x30) >> 4;
     uchar digits = (temp & 0x0F);
-    clock.ucDate = (tens * 10) + digits;
+    s_clock.ucDate = (tens * 10) + digits;
 }
 
 static void read_month()
@@ -363,13 +363,13 @@ static void read_month()
     uchar temp = assemble_byte();
     uchar digits = (temp & 0x0F);
     uchar tens = (temp & 0x10) >> 4;
-    clock.ucMonth = (tens * 10) + digits;
+    s_clock.ucMonth = (tens * 10) + digits;
 }
 
 static void read_day()
 {
     uchar temp = assemble_byte();
-    clock.ucDay = temp;
+    s_clock.ucDay = temp;
 }
 
 static void read_year()
@@ -377,5 +377,5 @@ static void read_year()
     uchar temp = assemble_byte();
     uchar tens = (temp & 0xF0) >> 4;
     uchar digits = (temp & 0x0F);
-    clock.ucYear = (tens * 10) + digits;
+    s_clock.ucYear = (tens * 10) + digits;
 }
