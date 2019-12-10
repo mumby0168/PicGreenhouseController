@@ -284,3 +284,15 @@ void Thermometer_ConvertTempratureToBcd(uchar ubyTempMsb, uchar ubyTempLsb, Ther
     pBcdTemperature->ubyThousandths = (((sDecimalValue % 100) / 10));
     pBcdTemperature->ubyTenThousandths = ((sDecimalValue % 10));
 }
+
+short Thermometer_ConvertTempratureToShort(const Thermometer_BcdTemperature* const pBcd)
+{
+    if (pBcd->bIsNegative)
+    {
+        return -1 * (pBcd->ubyHundreds * 1000) + (pBcd->ubyTens * 100) + (pBcd->ubyUnits * 10) + (pBcd->ubyTenths);
+    }
+    else
+    {
+        return (pBcd->ubyHundreds * 1000) + (pBcd->ubyTens * 100) + (pBcd->ubyUnits * 10) + (pBcd->ubyTenths);
+    }
+}

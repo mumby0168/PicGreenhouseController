@@ -4,13 +4,16 @@
 #include "../fst.h"
 #include "../drivers/eeprom.h"
 #include "../libs/Delays.h"
+#include "../drivers/thermometer.h"
+#include "time_set.h"
 
 
-static bool s_IsHot = false;
-static bool s_IsDay = false;
+static bool s_bIsHot = false;
+static bool s_bIsDay = false;
 
 static s_ubySelectedDigit = 0;
 static uchar s_aubyDigitLimits[5] = { 1, 1, 9, 9, 9 };
+static Eeprom_Eeprom s_eeprom;
 
 static void temp_set_display_render_temp(uchar* pSettingData)
 {
@@ -32,9 +35,9 @@ static void temp_set_display_render_temp(uchar* pSettingData)
     Lcd_WriteCharacter('C');
 }
 
-static void temp_set_display_select_cold_settings()
+static void temp_set_display_select_cold_settings(void)
 {
-    s_IsHot = false;
+    s_bIsHot = false;
     Lcd_SetCursorPosition(12, 1);
     Lcd_WriteString(g_Cold);
 
@@ -43,7 +46,7 @@ static void temp_set_display_select_cold_settings()
 
 static void temp_set_display_select_hot_settings()
 {
-    s_IsHot = true;
+    s_bIsHot = true;
     Lcd_SetCursorPosition(12, 1);
     Lcd_WriteString(g_Warm);
     
@@ -52,12 +55,12 @@ static void temp_set_display_select_hot_settings()
 
 static void temp_set_display_load_day_settings()
 {
-    s_IsDay = true;
+    s_bIsDay = true;
 }
 
 static void temp_set_display_load_night_settings()
 {
-    s_IsDay = false;
+    s_bIsDay = false;
 }
 
 static void temp_set_display_draw_carrot(void)
@@ -85,12 +88,12 @@ void Temp_Set_Display_Init(void)
 static void temp_set_display_up_arrow()
 {
     Lcd_SetCursorPosition(1, 1);
-    uchar* pSettingData = &Eeprom_Settings;
+    uchar* pSettingData = &s_eeprom;
     
-    if (!s_IsDay)
+    if (!s_bIsDay)
         pSettingData += sizeof(Eeprom_AlarmSettings);
     
-    if (!s_IsHot)
+    if (!s_bIsHot)
         pSettingData += EEPROM_WARM_COLD_ALARM_BYTES;   
     
     pSettingData += s_ubySelectedDigit;
@@ -99,19 +102,19 @@ static void temp_set_display_up_arrow()
         *pSettingData = 0;
     
     pSettingData -= s_ubySelectedDigit;
-    
+
     temp_set_display_render_temp(pSettingData);
 }
     
 static void temp_set_display_down_arrow()
 {
     Lcd_SetCursorPosition(1, 1);
-    uchar* pSettingData = &Eeprom_Settings;
+    uchar* pSettingData = &s_eeprom;
     
-    if (!s_IsDay)
+    if (!s_bIsDay)
         pSettingData += sizeof(Eeprom_AlarmSettings);
     
-    if (!s_IsHot)
+    if (!s_bIsHot)
         pSettingData += EEPROM_WARM_COLD_ALARM_BYTES;   
     
     pSettingData += s_ubySelectedDigit;
@@ -147,6 +150,7 @@ static void temp_set_display_right_arrow()
 
 static void temp_set_display_save()
 {
+    Eeprom_SetEeprom(&s_eeprom);
     if (!Eeprom_Save())
     {
         Lcd_ClearDisplay();
@@ -176,10 +180,11 @@ void Temp_Set_Display(void)
     Fst_SetAction(FST_ACTION_HANDLE_RIGHT_BUTTON, &temp_set_display_right_arrow);
     Fst_SetAction(FST_ACTION_SAVE, &temp_set_display_save);
     
-    uchar* pSettingData = &Eeprom_Settings;
+    Eeprom_GetEeprom(&s_eeprom);
+    uchar* pSettingData = &s_eeprom;
     
     Lcd_SetCursorPosition(1,1);
-    if(s_IsDay)
+    if(s_bIsDay)
     {
         Lcd_WriteString(g_Day);
     }
@@ -190,7 +195,7 @@ void Temp_Set_Display(void)
     }
 
     Lcd_SetCursorPosition(12, 1);
-    if(s_IsHot) 
+    if(s_bIsHot) 
     {
         Lcd_WriteString(g_Warm);
     }

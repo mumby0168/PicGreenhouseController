@@ -19,17 +19,17 @@ typedef struct _alarmSettings
     uchar ubyColdAlarmTenths;
 } Eeprom_AlarmSettings;
 
-typedef struct _eepromSettings
+typedef struct _eeprom
 {
     Eeprom_AlarmSettings daytimeAlarmSettings;
     Eeprom_AlarmSettings nighttimeAlarmSettings;
     const uchar ubyHasBeenBlanked;
-} Eeprom_EepromSettings;
+} Eeprom_Eeprom;
 
-Eeprom_EepromSettings Eeprom_Settings;
-
-static void eeprom_init_write();
-bool Eeprom_Save();
-void Eeprom_Load();
+bool Eeprom_Save(void);
+void Eeprom_Load(void);
+void Eeprom_LoadDefaultSettings(void);
+void Eeprom_GetEeprom(Eeprom_Eeprom* const pEeprom);
+void Eeprom_SetEeprom(const Eeprom_Eeprom* const pEeprom);
 
 #endif

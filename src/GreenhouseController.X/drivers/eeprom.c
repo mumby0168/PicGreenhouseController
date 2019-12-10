@@ -8,7 +8,9 @@
 #define EEPREOM_START_READ 1
 #define EEPREOM_START_WRITE 1
 
-bool Eeprom_Save()
+static Eeprom_Eeprom s_Eeprom;
+
+bool Eeprom_Save(void)
 {
     EECON1bits.EEPGD = EEPROM_DATA;
     EECON1bits.WREN = EEPROM_ENABLE_WRITE;
@@ -16,8 +18,8 @@ bool Eeprom_Save()
     
     EEADR = 0;
     EECON1bits.WRERR = 0;    
-    uchar* pEepromSettings = &Eeprom_Settings;
-    for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
+    uchar* pEepromSettings = &s_Eeprom;
+    for (uchar* p = &s_Eeprom; p < pEepromSettings + sizeof(Eeprom_Eeprom); p++)
     {
         PIR2bits.EEIF = 0; //clear the eeprom finished interrupt flag.
         
@@ -45,14 +47,14 @@ bool Eeprom_Save()
     return true;
 }
 
-void Eeprom_Load()
+void Eeprom_Load(void)
 {
     //initialise the write
     EECON1bits.EEPGD = EEPROM_DATA;
     
     EEADR = 0;
-    uchar* pEepromSettings = &Eeprom_Settings;
-    for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
+    uchar* pEeprom = &s_Eeprom;
+    for (uchar* p = &s_Eeprom; p < pEeprom + sizeof(Eeprom_Eeprom); p++)
     {
         EEDATA = 0x00;
         
@@ -62,24 +64,43 @@ void Eeprom_Load()
         EEADR++;
     }
     
-    if (Eeprom_Settings.ubyHasBeenBlanked == 0xFF)
+    if (s_Eeprom.ubyHasBeenBlanked == 0xFF)
     {
-        for (uchar* p = &Eeprom_Settings; p < pEepromSettings + sizeof(Eeprom_EepromSettings); p++)
+        for (uchar* p = &s_Eeprom; p < pEeprom + sizeof(Eeprom_Eeprom); p++)
             *p = 0;
         
-        //Load default settings
-        //cold settings
-        Eeprom_Settings.daytimeAlarmSettings.ubyColdAlarmTens = 1;
-        Eeprom_Settings.daytimeAlarmSettings.ubyColdAlarmUnits = 8;
-        Eeprom_Settings.nighttimeAlarmSettings.ubyColdAlarmTens = 1;
-        Eeprom_Settings.nighttimeAlarmSettings.ubyColdAlarmUnits = 4;
-        
-        //hot settings
-        Eeprom_Settings.daytimeAlarmSettings.ubyWarmAlarmTens = 2;
-        Eeprom_Settings.daytimeAlarmSettings.ubyWarmAlarmUnits = 4;
-        Eeprom_Settings.nighttimeAlarmSettings.ubyWarmAlarmTens = 2;
-        Eeprom_Settings.nighttimeAlarmSettings.ubyWarmAlarmUnits = 4;
+        Eeprom_LoadDefaultSettings();
         
         Eeprom_Save();
     }
+}
+
+void Eeprom_LoadDefaultSettings(void)
+{
+    //Load default settings
+    //cold settings
+    s_Eeprom.daytimeAlarmSettings.ubyColdAlarmTens = 1;
+    s_Eeprom.daytimeAlarmSettings.ubyColdAlarmUnits = 8;
+    s_Eeprom.nighttimeAlarmSettings.ubyColdAlarmTens = 1;
+    s_Eeprom.nighttimeAlarmSettings.ubyColdAlarmUnits = 4;
+
+    //hot settings
+    s_Eeprom.daytimeAlarmSettings.ubyWarmAlarmTens = 2;
+    s_Eeprom.daytimeAlarmSettings.ubyWarmAlarmUnits = 4;
+    s_Eeprom.nighttimeAlarmSettings.ubyWarmAlarmTens = 2;
+    s_Eeprom.nighttimeAlarmSettings.ubyWarmAlarmUnits = 4;
+}
+
+void Eeprom_GetEeprom(Eeprom_Eeprom* const pEepromCopy)
+{
+    uchar* pEeprom = &s_Eeprom;
+    for (uchar i = 0; i < sizeof(Eeprom_Eeprom); i++)
+        *((uchar*)pEepromCopy + i) = *(pEeprom + i);
+}
+
+void Eeprom_SetEeprom(const Eeprom_Eeprom* const pEepromCopy)
+{
+    uchar* pEeprom = &s_Eeprom;
+    for (uchar i = 0; i < sizeof(Eeprom_Eeprom); i++)
+        *(pEeprom + i) = *((uchar*)pEepromCopy + i);
 }

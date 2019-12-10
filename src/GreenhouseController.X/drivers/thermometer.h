@@ -45,5 +45,6 @@ uchar Thermometer_CopyE2ToScratchPad(void);
 bool Thermometer_IsAlarming(void);
 float Thermometer_ConvertTempratureToFloat(uchar ubyTempMsb, uchar ubyTempLsb);
 void Thermometer_ConvertTempratureToBcd(uchar ubyTempMsb, uchar ubyTempLsb, Thermometer_BcdTemperature* pBcdTemperature);
+short Thermometer_ConvertTempratureToShort(const Thermometer_BcdTemperature* const pBcd);
 
 #endif

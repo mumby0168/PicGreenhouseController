@@ -27,27 +27,21 @@ bool Alarm_Program_IsCooling(void)
 void Alarm_Program_Init(void)
 {
     TRISE = 0b000;
-    PORTE = 0b000;    
+    PORTE = 0b000;
+    TRISB6 = 0;
+    TRISB7 = 0;
+    RB6 = 0;
+    RB7 = 0;
     
     Alarm_Program_Update();
-}
-
-static int alarm_program_get_temp_as_short(const Thermometer_BcdTemperature* const pBcd)
-{
-    if (pBcd->bIsNegative)
-    {
-        return -1 * (pBcd->ubyHundreds * 1000) + (pBcd->ubyTens * 100) + (pBcd->ubyUnits * 10) + (pBcd->ubyTenths);
-    }
-    else
-    {
-        return (pBcd->ubyHundreds * 1000) + (pBcd->ubyTens * 100) + (pBcd->ubyUnits * 10) + (pBcd->ubyTenths);
-    }
 }
 
 void Alarm_Program_Update(void)
 {    
     Timing_ReadTime();
-    Eeprom_AlarmSettings* pSettings = &Eeprom_Settings;
+    Eeprom_Eeprom eepromSettings;
+    Eeprom_GetEeprom(&eepromSettings);
+    Eeprom_AlarmSettings* pSettings = &eepromSettings;
     
     ushort usCurrentTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(g_clock.hours, g_clock.minutes);
     if (usCurrentTimeInMins >= s_usDayProgramStartTimeInMins && usCurrentTimeInMins < s_usNightProgramStartTimeInMins)
@@ -64,15 +58,16 @@ void Alarm_Program_Update(void)
     Thermometer_ReadScratchPad(&sp, 2);
     Thermometer_BcdTemperature tempBcd;
     Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
-    int sCurrentTemp = alarm_program_get_temp_as_short(&tempBcd);
-    int sHighTemp = alarm_program_get_temp_as_short(pSettings);
-    int sLowTemp = alarm_program_get_temp_as_short(((uchar*)pSettings) + 5);
+    int sCurrentTemp = Thermometer_ConvertTempratureToShort(&tempBcd);
+    int sHighTemp = Thermometer_ConvertTempratureToShort(pSettings);
+    int sLowTemp = Thermometer_ConvertTempratureToShort(((uchar*)pSettings) + 5);
     
     if (sCurrentTemp > sHighTemp)
     {
         s_bIsCooling = true;
         s_bIsHeating = false;
-        //PORTE = 0b001;
+        RB6 = 0;
+        RB7 = 1;
         
         if (s_sPrevTemp - sCurrentTemp < 0) //if the vector from current to prev is negative or the same then it is not cooling so sound alarm
         {
@@ -87,6 +82,8 @@ void Alarm_Program_Update(void)
     {
         s_bIsHeating = true;
         s_bIsCooling = false;
+        RB6 = 1;
+        RB7 = 0;
         
         if (s_sPrevTemp - sCurrentTemp > 0) //if the vector from current to prev is positive or the same then it is not warming so sound alarm
         {
@@ -101,6 +98,8 @@ void Alarm_Program_Update(void)
     {
         s_bIsHeating = false;
         s_bIsCooling = false;
+        RB6 = 0;
+        RB7 = 0;
         PORTE = 0b000;
     }
     
