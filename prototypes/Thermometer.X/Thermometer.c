@@ -117,7 +117,7 @@ uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBy
     if (byBytesToRead > sizeof(Thermometer_ScratchPad))
         byBytesToRead = sizeof(Thermometer_ScratchPad);
     
-    for (uchar* pSpEntry = pScratchPad; pSpEntry < pSpEntry + byBytesToRead; pSpEntry++)
+    for (uchar* pSpEntry = pScratchPad; pSpEntry < pScratchPad + byBytesToRead; pSpEntry++)
         *pSpEntry = thermometer_read_byte();
     
     byStatus = thermometer_reset();

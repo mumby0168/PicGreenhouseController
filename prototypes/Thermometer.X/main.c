@@ -29,7 +29,7 @@ void main(void)
         byRes = Thermometer_ReadScratchPad(&sp, sizeof(Thermometer_ScratchPad));
         
         Thermometer_BcdTemperature temperatureBcdValue;
-        Thermometer_ConvertTempratureToBcd(0b11111111, 0b11111000, &temperatureBcdValue);
+        Thermometer_ConvertTempratureToBcd(0b00000000, 0b00001000, &temperatureBcdValue);
         
         if (byRes == 0)
         {

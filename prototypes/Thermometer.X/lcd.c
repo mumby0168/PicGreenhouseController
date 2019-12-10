@@ -15,7 +15,7 @@ static uchar s_ubyDdramPos = 0;
 
 static void lcd_delay()
 {
-    for (int i=0; i<5000; i++);
+    for (int i=0; i<50; i++);
 }
 
 static void lcd_write_command(const uchar data)

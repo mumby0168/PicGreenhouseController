@@ -36,7 +36,7 @@ inline void ClearHighNibble(uchar* val)
 
 inline uchar GetLowNibble(uchar* val)
 {
-    return *val & 0xF0;
+    return *val & 0x0F;
 }
 
 inline uchar GetHighNibble(uchar* val)
