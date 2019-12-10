@@ -53,32 +53,10 @@ static void main_display_render_time_and_temp()
     Lcd_WriteString(months[clock.ucMonth - 1]);
     Lcd_WriteCharacter(' ');
     Lcd_WriteNumber(clock.ucYear);
-       
-    if (Alarm_Program_IsCooling())
-    {
-        Lcd_SetCursorPosition(5, 3);
-        Lcd_WriteString("       ");
-        Lcd_SetCursorPosition(5, 3);
-        Lcd_WriteString("COOLING"); 
-    }
-    else if (Alarm_Program_IsHeating())
-    {
-        Lcd_SetCursorPosition(5, 3);
-        Lcd_WriteString("           ");
-        Lcd_SetCursorPosition(5, 3);
-        Lcd_WriteString("HEATING");
-    }
-    else
-    {
-        Lcd_SetCursorPosition(5, 3);
-        Lcd_WriteString("         ");
-    }
     
     Thermometer_ScratchPad sp;
     if (Thermometer_ReadScratchPad(&sp, 2))
     {
-        Lcd_SetCursorPosition(5, 3);
-        Lcd_WriteString("       ");
         Lcd_SetCursorPosition(1, 2);
         Lcd_WriteString("Cannot read thermometer.");
         s_bPrevDrawHadError = true;
@@ -104,6 +82,26 @@ static void main_display_render_time_and_temp()
     Lcd_WriteCharacter('.');
     Lcd_WriteCharacter(tempBcd.ubyTenths + 48);
     Lcd_WriteCharacter('C');
+    
+    if (Alarm_Program_IsCooling())
+    {
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("       ");
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("COOLING"); 
+    }
+    else if (Alarm_Program_IsHeating())
+    {
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("           ");
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("HEATING");
+    }
+    else
+    {
+        Lcd_SetCursorPosition(5, 3);
+        Lcd_WriteString("         ");
+    }
 }
 
 static inline void main_display_redraw_dynamic_elements(void)
