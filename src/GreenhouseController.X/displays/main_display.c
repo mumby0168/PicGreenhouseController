@@ -21,14 +21,14 @@ static void main_display_render_time_and_temp()
     
     //TIME
     Lcd_SetCursorPosition(1, 1);
-    Lcd_WriteCharacter(rawClock.hoursTens + 48);
-    Lcd_WriteCharacter(rawClock.hoursDigits + 48);
+    Lcd_WriteCharacter(rawClock.ucHoursTens + 48);
+    Lcd_WriteCharacter(rawClock.ucHoursDigits + 48);
     Lcd_WriteCharacter(':'); 
-    Lcd_WriteCharacter(rawClock.minutesTens + 48);
-    Lcd_WriteCharacter(rawClock.minutesDigits + 48);
+    Lcd_WriteCharacter(rawClock.ucMinutesTens + 48);
+    Lcd_WriteCharacter(rawClock.ucMinutesDigits + 48);
     Lcd_WriteCharacter(':'); 
-    Lcd_WriteCharacter(rawClock.secondsTens + 48);
-    Lcd_WriteCharacter(rawClock.secondsDigits + 48);
+    Lcd_WriteCharacter(rawClock.ucSecondsTens + 48);
+    Lcd_WriteCharacter(rawClock.ucSecondsDigits + 48);
     
     if (Alarm_Program_GetProgram() == ALARM_PROGRAM_DAY)
     {
@@ -43,16 +43,16 @@ static void main_display_render_time_and_temp()
     
     // DAY & DATE
     Lcd_SetCursorPosition(2, 4);
-    Lcd_WriteString(days[clock.day - 1]);    
+    Lcd_WriteString(days[clock.ucDay - 1]);    
     Lcd_WriteCharacter(' ');
-    Lcd_WriteNumber(clock.date);
+    Lcd_WriteNumber(clock.ucDate);
     
     //Month and year
     Lcd_WriteCharacter(' ');
     Lcd_WriteCharacter(' ');
-    Lcd_WriteString(months[clock.month - 1]);
+    Lcd_WriteString(months[clock.ucMonth - 1]);
     Lcd_WriteCharacter(' ');
-    Lcd_WriteNumber(clock.year);
+    Lcd_WriteNumber(clock.ucYear);
        
     if (Alarm_Program_IsCooling())
     {

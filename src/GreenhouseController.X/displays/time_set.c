@@ -25,26 +25,26 @@ static void time_set_display_draw_carrot(void)
 static void time_set_display_render_time(void)
 {
     Lcd_SetCursorPosition(5, 2);
-    Lcd_WriteCharacter(s_TimeSet.hoursTens + 48);
-    Lcd_WriteCharacter(s_TimeSet.hoursDigits + 48);
+    Lcd_WriteCharacter(s_TimeSet.ucHoursTens + 48);
+    Lcd_WriteCharacter(s_TimeSet.ucHoursDigits + 48);
     
     Lcd_WriteCharacter(':');
-    Lcd_WriteCharacter(s_TimeSet.minutesTens + 48);
-    Lcd_WriteCharacter(s_TimeSet.minutesDigits + 48);
+    Lcd_WriteCharacter(s_TimeSet.ucMinutesTens + 48);
+    Lcd_WriteCharacter(s_TimeSet.ucMinutesDigits + 48);
     
     Lcd_WriteCharacter(':');
-    Lcd_WriteCharacter(s_TimeSet.secondsTens + 48);
-    Lcd_WriteCharacter(s_TimeSet.secondsDigits + 48);
+    Lcd_WriteCharacter(s_TimeSet.ucSecondsTens + 48);
+    Lcd_WriteCharacter(s_TimeSet.ucSecondsDigits + 48);
 }
 
 static void time_set_update_time_limits()
 {
-    if (s_TimeSet.hoursTens == 2)
+    if (s_TimeSet.ucHoursTens == 2)
     {
         s_aubyTimeLimits[1] = 3;
-        if (s_TimeSet.hoursDigits > s_aubyTimeLimits[1])
+        if (s_TimeSet.ucHoursDigits > s_aubyTimeLimits[1])
         {
-            s_TimeSet.hoursDigits = s_aubyTimeLimits[1];
+            s_TimeSet.ucHoursDigits = s_aubyTimeLimits[1];
         }
     }
     else
@@ -115,9 +115,9 @@ static void time_set_display_right_arrow(void)
 
 static void time_set_display_save(void)
 {
-    Timing_SetTime((s_TimeSet.hoursTens * 10) + s_TimeSet.hoursDigits,
-                   (s_TimeSet.minutesTens * 10) + s_TimeSet.minutesDigits,
-                   (s_TimeSet.secondsTens * 10) + s_TimeSet.secondsDigits);
+    Timing_SetTime((s_TimeSet.ucHoursTens * 10) + s_TimeSet.ucHoursDigits,
+                   (s_TimeSet.ucMinutesTens * 10) + s_TimeSet.ucMinutesDigits,
+                   (s_TimeSet.ucSecondsTens * 10) + s_TimeSet.ucSecondsDigits);
     
     Lcd_ClearDisplay();
     Lcd_SetCursorPosition(1, 1);

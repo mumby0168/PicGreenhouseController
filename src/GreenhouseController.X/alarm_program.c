@@ -46,7 +46,7 @@ void Alarm_Program_Update(void)
     Clock clock;
     Timing_ReadClock(&clock);
     
-    ushort usCurrentTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(clock.hours, clock.minutes);
+    ushort usCurrentTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(clock.ucHours, clock.ucMinutes);
     if (usCurrentTimeInMins >= s_usDayProgramStartTimeInMins && usCurrentTimeInMins < s_usNightProgramStartTimeInMins)
     {
         s_CurrentProgram = ALARM_PROGRAM_DAY;

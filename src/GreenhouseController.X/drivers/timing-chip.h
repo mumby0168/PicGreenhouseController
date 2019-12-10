@@ -10,23 +10,23 @@
 
 typedef struct
 {
-    uchar seconds;
-    uchar minutes;
-    uchar hours;
-    uchar day;
-    uchar date;
-    uchar month;
-    uchar year;
+    uchar ucSeconds;
+    uchar ucMinutes;
+    uchar ucHours;
+    uchar ucDay;
+    uchar ucDate;
+    uchar ucMonth;
+    uchar ucYear;
 } Clock;
 
 typedef struct 
 {
-    uchar hoursTens;
-    uchar hoursDigits;
-    uchar minutesTens;
-    uchar minutesDigits;
-    uchar secondsTens;
-    uchar secondsDigits;    
+    uchar ucHoursTens;
+    uchar ucHoursDigits;
+    uchar ucMinutesTens;
+    uchar ucMinutesDigits;
+    uchar ucSecondsTens;
+    uchar ucSecondsDigits;    
 } RawClock;
 
 const uchar g_aubyDaysInMonths[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
@@ -34,13 +34,12 @@ const uchar g_aubyDaysInMonths[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 3
 
 void Timing_ReadRawClock(RawClock* pRawClock);
 void Timing_ReadClock(Clock* pclock);
-
-void Timing_SetTime(uchar hours, uchar minutes, uchar seconds);
-void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year);
+void Timing_SetTime(uchar ucHours, uchar ucMinutes, uchar ucSeconds);
+void Timing_SetCalendar(uchar ucDay, uchar ucDate, uchar ucMonth, uchar ucYear);
 void Timing_ReadTime(void);
 void Timing_ReadCalendar(void);
 void Timing_Init(void);
-bool Timing_IsLeapYear(const uchar year);
-uchar Timing_GetDayFromDate(const uchar date, const uchar month, const uchar year);
+bool Timing_IsLeapYear(const uchar ucYear);
+uchar Timing_GetDayFromDate(const uchar ucDate, const uchar ucMonth, const uchar ucYear);
 
 #endif
