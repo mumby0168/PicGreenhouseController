@@ -13,16 +13,22 @@ static bool s_bPrevDrawHadError = false;
 
 static void main_display_render_time_and_temp()
 {
+    
+    RawClock rawClock;
+    Timing_ReadRawClock(&rawClock);
+    Clock clock;
+    Timing_ReadClock(&clock);
+    
     //TIME
     Lcd_SetCursorPosition(1, 1);
-    Lcd_WriteCharacter(g_rawClock.hoursTens + 48);
-    Lcd_WriteCharacter(g_rawClock.hoursDigits + 48);
+    Lcd_WriteCharacter(rawClock.hoursTens + 48);
+    Lcd_WriteCharacter(rawClock.hoursDigits + 48);
     Lcd_WriteCharacter(':'); 
-    Lcd_WriteCharacter(g_rawClock.minutesTens + 48);
-    Lcd_WriteCharacter(g_rawClock.minutesDigits + 48);
+    Lcd_WriteCharacter(rawClock.minutesTens + 48);
+    Lcd_WriteCharacter(rawClock.minutesDigits + 48);
     Lcd_WriteCharacter(':'); 
-    Lcd_WriteCharacter(g_rawClock.secondsTens + 48);
-    Lcd_WriteCharacter(g_rawClock.secondsDigits + 48);
+    Lcd_WriteCharacter(rawClock.secondsTens + 48);
+    Lcd_WriteCharacter(rawClock.secondsDigits + 48);
     
     if (Alarm_Program_GetProgram() == ALARM_PROGRAM_DAY)
     {
@@ -37,16 +43,16 @@ static void main_display_render_time_and_temp()
     
     // DAY & DATE
     Lcd_SetCursorPosition(2, 4);
-    Lcd_WriteString(days[g_clock.day - 1]);    
+    Lcd_WriteString(days[clock.day - 1]);    
     Lcd_WriteCharacter(' ');
-    Lcd_WriteNumber(g_clock.date);
+    Lcd_WriteNumber(clock.date);
     
     //Month and year
     Lcd_WriteCharacter(' ');
     Lcd_WriteCharacter(' ');
-    Lcd_WriteString(months[g_clock.month - 1]);
+    Lcd_WriteString(months[clock.month - 1]);
     Lcd_WriteCharacter(' ');
-    Lcd_WriteNumber(g_clock.year);
+    Lcd_WriteNumber(clock.year);
        
     if (Alarm_Program_IsCooling())
     {

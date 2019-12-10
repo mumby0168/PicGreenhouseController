@@ -29,11 +29,11 @@ typedef struct
     uchar secondsDigits;    
 } RawClock;
 
-
-Clock g_clock;
-RawClock g_rawClock;
 const uchar g_aubyDaysInMonths[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
+
+void Timing_ReadRawClock(RawClock* pRawClock);
+void Timing_ReadClock(Clock* pclock);
 
 void Timing_SetTime(uchar hours, uchar minutes, uchar seconds);
 void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year);

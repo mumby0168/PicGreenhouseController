@@ -49,7 +49,10 @@ void Alarm_Program_Update(void)
     Timing_ReadTime();
     Eeprom_AlarmSettings* pSettings = &Eeprom_Settings;
     
-    ushort usCurrentTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(g_clock.hours, g_clock.minutes);
+    Clock clock;
+    Timing_ReadClock(&clock);
+    
+    ushort usCurrentTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(clock.hours, clock.minutes);
     if (usCurrentTimeInMins >= s_usDayProgramStartTimeInMins && usCurrentTimeInMins < s_usNightProgramStartTimeInMins)
     {
         s_CurrentProgram = ALARM_PROGRAM_DAY;

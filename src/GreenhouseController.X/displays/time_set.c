@@ -130,7 +130,9 @@ void Time_Set_Display(void)
 {
     s_ubyDigitPosition = 0;
     Timing_ReadTime();
-    memcpy(&s_TimeSet, &g_rawClock, sizeof(RawClock));
+    RawClock rawClock;
+    Timing_ReadRawClock(&rawClock);
+    memcpy(&s_TimeSet, &rawClock, sizeof(RawClock));
 
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &time_set_display_up_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &time_set_display_down_arrow);

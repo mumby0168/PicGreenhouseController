@@ -49,35 +49,50 @@
 #define COMPLETE_OPERATION RST = 0;
 
 
+//Structures
+static RawClock rawClock;
+static Clock clock;
+
 //Write Operations
-static void WriteDate(uchar data);
-static void WriteSeconds(uchar seconds);
-static void WriteHours(uchar hours);
-static void WriteMinutes(uchar minutes);
-static void WriteDate(uchar date);
-static void WriteMonth(uchar month);
-static void WriteDay(uchar day);
-static void WriteYear(uchar year);
+static void write_date(uchar data);
+static void write_seconds(uchar seconds);
+static void write_hours(uchar hours);
+static void write_minutes(uchar minutes);
+static void write_date(uchar date);
+static void write_month(uchar month);
+static void write_day(uchar day);
+static void write_year(uchar year);
 
 
 
 //Read Operations
-static void ReadSeconds(void);
-static void ReadMinutes(void);
-static void ReadHours(void);
-static void ReadDate(void);
-static void ReadMonth(void);
-static void ReadDay(void);
-static void ReadYear(void);
+static void read_seconds(void);
+static void read_minutes(void);
+static void read_hours(void);
+static void read_date(void);
+static void read_month(void);
+static void read_day(void);
+static void read_year(void);
 
 //Low Level API
-inline void WriteCommandByte(uchar);
-uchar AssembleByte();
-void WriteByte(uchar*);
+inline static void write_command_byte(uchar);
+static uchar assemble_byte();
+static void write_byte(uchar*);
 
 /***********************Implementation*************************/
 
 // High Level API
+
+void Timing_ReadRawClock(RawClock* pRawClock)
+{
+    pRawClock = (RawClock*)&rawClock;
+}
+
+
+void Timing_ReadClock(Clock* pClock)
+{
+    pClock = (Clock*)&clock;
+}
 
 void Timing_Init()
 {
@@ -93,78 +108,78 @@ void Timing_Init()
     // IO as output
     IO_CONFIG = 0;
     // speak to sir to find out where docs are for these operations
-    WriteCommandByte(CONTROL_CMD);
-    WriteByte(0); 
+    write_command_byte(CONTROL_CMD);
+    write_byte(0); 
 
     COMPLETE_OPERATION // Drives reset low.
 }
 
 void Timing_SetCalendar(uchar day, uchar date, uchar month, uchar year)
 {    
-    WriteCommandByte(WRITE_DAY);
-    WriteDay(day);
+    write_command_byte(WRITE_DAY);
+    write_day(day);
     COMPLETE_OPERATION
 
-    WriteCommandByte(WRITE_DATE);
-    WriteDate(date);
+    write_command_byte(WRITE_DATE);
+    write_date(date);
     COMPLETE_OPERATION
 
-    WriteCommandByte(WRITE_MONTH);
-    WriteMonth(month);
+    write_command_byte(WRITE_MONTH);
+    write_month(month);
     COMPLETE_OPERATION
 
-    WriteCommandByte(WRITE_YEAR);
-    WriteYear(year);
+    write_command_byte(WRITE_YEAR);
+    write_year(year);
     COMPLETE_OPERATION
 }
 
 void Timing_SetTime(uchar hours, uchar minutes, uchar seconds)
 {    
-    WriteCommandByte(WRITE_HOURS);
-    WriteHours(hours);
+    write_command_byte(WRITE_HOURS);
+    write_hours(hours);
     COMPLETE_OPERATION
 
-    WriteCommandByte(WRITE_MINUTES);
-    WriteMinutes(minutes);
+    write_command_byte(WRITE_MINUTES);
+    write_minutes(minutes);
     COMPLETE_OPERATION
 
-    WriteCommandByte(WRITE_SECONDS);
-    WriteSeconds(seconds);
+    write_command_byte(WRITE_SECONDS);
+    write_seconds(seconds);
     COMPLETE_OPERATION
 }
 
 void Timing_ReadTime()
 {
-    WriteCommandByte(READ_HOURS);
-    ReadHours();
+    write_command_byte(READ_HOURS);
+    read_hours();
     COMPLETE_OPERATION
 
-    WriteCommandByte(READ_MINUTES);
-    ReadMinutes();
+    write_command_byte(READ_MINUTES);
+    read_minutes();
     COMPLETE_OPERATION    
 
-    WriteCommandByte(READ_SECONDS);
-    ReadSeconds();
+    write_command_byte(READ_SECONDS);
+    read_seconds();
     COMPLETE_OPERATION
 }
 
 
 void Timing_ReadCalendar()
 {
-    WriteCommandByte(READ_DAY);
-    ReadDay();
+    write_command_byte(READ_DAY);
+    read_day();
     COMPLETE_OPERATION
 
-    WriteCommandByte(READ_DATE);
-    ReadDate();
+    write_command_byte(READ_DATE);
+    read_date();
     COMPLETE_OPERATION
 
-    WriteCommandByte(READ_MONTH);
-    ReadMonth();
+    write_command_byte(READ_MONTH);
+    read_month();
     COMPLETE_OPERATION
 
-    WriteCommandByte(READ_YEAR);
-    ReadYear();
+    write_command_byte(READ_YEAR);
+    read_year();
     COMPLETE_OPERATION
 }
 
@@ -200,16 +215,16 @@ uchar Timing_GetDayFromDate(const uchar date, const uchar month, const uchar yea
 }
 
 //Low Level API
-inline void WriteCommandByte(uchar byte)
+static inline void write_command_byte(uchar byte)
 {    
     //set io pin to output
     IO_CONFIG = 0;    
     RST = 1; // Drive RST High        
     //write the 8 bits of the command byte.
-    WriteByte(&byte);
+    write_byte(&byte);
 }
 
-void WriteByte(uchar *byte)
+static void write_byte(uchar *byte)
 {    
     IO_CONFIG = 0;
     char i;
@@ -222,7 +237,7 @@ void WriteByte(uchar *byte)
     SCLK = 0;
 }
 
-inline uchar AssembleByte()
+static inline uchar assemble_byte()
 {
     IO_CONFIG = 1;
     uchar ret = 0;    
@@ -242,27 +257,27 @@ inline uchar AssembleByte()
 
 //Write Operations
 
-static void WriteSeconds(uchar seconds)
+static void write_seconds(uchar seconds)
 {
     uchar encoded = 0;
     uchar tens = seconds / 10;
     uchar digits = seconds % 10;
     encoded = digits;
     encoded |= (tens << 4);
-    WriteByte(&encoded);
+    write_byte(&encoded);
 }
 
-static void WriteMinutes(uchar minutes)
+static void write_minutes(uchar minutes)
 {
     uchar encoded = 0;
     uchar tens = minutes / 10;
     uchar digits = minutes % 10;
     encoded = digits;
     encoded |= (tens << 4);
-    WriteByte(&encoded);
+    write_byte(&encoded);
 }
 
-static void WriteHours(uchar hours)
+static void write_hours(uchar hours)
 {
     uchar encoded = 0;
     uchar tens = hours / 10;    
@@ -272,68 +287,68 @@ static void WriteHours(uchar hours)
 
     encoded |= (tens << 4);    
     
-    WriteByte(&encoded);
+    write_byte(&encoded);
 }
 
-static void WriteDate(uchar date)
+static void write_date(uchar date)
 {
     uchar digits = date % 10;
     uchar tens = date / 10;    
     uchar encoded = digits;
     encoded |= (tens << 4);
-    WriteByte(&encoded);    
+    write_byte(&encoded);    
 }
 
-static void WriteMonth(uchar month)
+static void write_month(uchar month)
 {
     uchar digits = month % 10;
     uchar tens = month / 10;    
     uchar encoded = digits;
     if(tens == 1) encoded |= (tens << 4);
-    WriteByte(&encoded);
+    write_byte(&encoded);
 }
 
-static void WriteDay(uchar day)
+static void write_day(uchar day)
 {
-    WriteByte(&day);    
+    write_byte(&day);    
 }
 
-static void WriteYear(uchar year)
+static void write_year(uchar year)
 {
     uchar digits = year % 10;    
     uchar tens = year / 10;
     uchar encoded = digits;    
     encoded |= (tens << 4);
-    WriteByte(&encoded);    
+    write_byte(&encoded);    
 }
 
 
 //Read Operations
 
-static void ReadSeconds()
+static void read_seconds()
 {    
-    uchar temp = AssembleByte();
+    uchar temp = assemble_byte();
     uchar tens = (temp & 0x70) >> 4;    
     uchar digits = (temp & 0x0F);        
-    g_rawClock.secondsDigits = digits;
-    g_rawClock.secondsTens = tens;
-    g_clock.seconds = (tens * 10) + digits;
+    rawClock.secondsDigits = digits;
+    rawClock.secondsTens = tens;
+    clock.seconds = (tens * 10) + digits;
 }
 
-static void ReadMinutes()
+static void read_minutes()
 {    
-    uchar temp = AssembleByte();    
+    uchar temp = assemble_byte();    
     uchar tens = (temp & 0x70) >> 4;
     uchar digits = (temp & 0x0F);    
-    g_rawClock.minutesDigits = digits;
-    g_rawClock.minutesTens = tens;
-    g_clock.minutes = (tens * 10) + digits;
+    rawClock.minutesDigits = digits;
+    rawClock.minutesTens = tens;
+    clock.minutes = (tens * 10) + digits;
 }
 
-static void ReadHours()
+static void read_hours()
 {
     //TODO: double check assumptions made here based of bit definitions from the datasheet.   
-    uchar temp = AssembleByte();    
+    uchar temp = assemble_byte();    
     uchar digits = (temp & 0x0F);
     //assume 1 means 24 hr clock i.e. after 12am.
     uchar tens = 0;
@@ -342,37 +357,37 @@ static void ReadHours()
 
     
 
-    g_rawClock.hoursDigits = digits;
-    g_rawClock.hoursTens = tens;
-    g_clock.hours = (tens * 10) + digits;
+    rawClock.hoursDigits = digits;
+    rawClock.hoursTens = tens;
+    clock.hours = (tens * 10) + digits;
 }
 
-static void ReadDate()
+static void read_date()
 {
-    uchar temp = AssembleByte();
+    uchar temp = assemble_byte();
     uchar tens = (temp & 0x30) >> 4;
     uchar digits = (temp & 0x0F);
-    g_clock.date = (tens * 10) + digits;    
+    clock.date = (tens * 10) + digits;    
 }
 
-static void ReadMonth()
+static void read_month()
 {    
-    uchar temp = AssembleByte();  
+    uchar temp = assemble_byte();  
     uchar digits = (temp & 0x0F);
     uchar tens = (temp & 0x10) >> 4;
-    g_clock.month = (tens * 10) + digits;
+    clock.month = (tens * 10) + digits;
 }
 
-static void ReadDay()
+static void read_day()
 {    
-    uchar temp = AssembleByte();
-    g_clock.day = temp;
+    uchar temp = assemble_byte();
+    clock.day = temp;
 }
 
-static void ReadYear()
+static void read_year()
 {
-    uchar temp = AssembleByte(); 
+    uchar temp = assemble_byte(); 
     uchar tens = (temp & 0xF0) >> 4;
     uchar digits = (temp & 0x0F);
-    g_clock.year = (tens * 10) + digits;
+    clock.year = (tens * 10) + digits;
 }
