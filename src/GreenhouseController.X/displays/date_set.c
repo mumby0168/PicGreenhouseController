@@ -28,13 +28,6 @@ static void date_set_display_draw_carrot(void)
     Lcd_WriteString("^^");
 }
 
-static void date_set_update_limits()
-{
-    s_aubyDateLimits[0] = g_aubyDaysInMonths[s_DateSet.month - 1];
-    if (Timing_IsLeapYear(s_DateSet.year) && s_DateSet.month == 2)
-        s_aubyDateLimits[0] += 1;
-}
-
 static void date_set_display_render_date()
 {
     Lcd_SetCursorPosition(5, 2);
@@ -45,6 +38,18 @@ static void date_set_display_render_date()
     Lcd_WriteCharacter('/');
     
     Lcd_WriteNumber(s_DateSet.year);
+}
+
+static void date_set_update_limits()
+{
+    s_aubyDateLimits[0] = g_aubyDaysInMonths[s_DateSet.month - 1];
+    if (Timing_IsLeapYear(s_DateSet.year) && s_DateSet.month == 2)
+        s_aubyDateLimits[0] += 1;
+    
+    if (s_DateSet.date > s_aubyDateLimits[0])
+        s_DateSet.date = s_aubyDateLimits[0];
+    
+    date_set_display_render_date();
 }
 
 static void date_set_display_up_arrow(void)
