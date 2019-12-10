@@ -6,7 +6,7 @@
 #include "../fst.h"
 #include "../libs/Delays.h"
 
-static RawClock s_TimeSet;
+static Timing_RawClock s_TimeSet;
 static uchar s_ubyDigitPosition = 0;
 static uchar s_aubyTimeLimits[6] = { 2, 9, 5, 9, 5, 9 };
 
@@ -130,9 +130,9 @@ void Time_Set_Display(void)
 {
     s_ubyDigitPosition = 0;
     Timing_ReadTime();
-    RawClock rawClock;
+    Timing_RawClock rawClock;
     Timing_ReadRawClock(&rawClock);
-    memcpy(&s_TimeSet, &rawClock, sizeof(RawClock));
+    memcpy(&s_TimeSet, &rawClock, sizeof(Timing_RawClock));
 
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &time_set_display_up_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &time_set_display_down_arrow);

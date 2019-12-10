@@ -57,7 +57,7 @@ void Alarm_Program_Update(void)
     Eeprom_GetEeprom(&eepromSettings);
     uchar* pSettings = &eepromSettings;
     
-    Clock clock;
+    Timing_Clock clock;
     Timing_ReadClock(&clock);
     
     ushort usCurrentTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(clock.ucHours, clock.ucMinutes);

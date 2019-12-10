@@ -14,9 +14,9 @@ static bool s_bPrevDrawHadError = false;
 static void main_display_render_time_and_temp()
 {
     
-    RawClock rawClock;
+    Timing_RawClock rawClock;
     Timing_ReadRawClock(&rawClock);
-    Clock clock;
+    Timing_Clock clock;
     Timing_ReadClock(&clock);
     
     //TIME

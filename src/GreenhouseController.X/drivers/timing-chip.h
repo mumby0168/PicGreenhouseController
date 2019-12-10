@@ -8,7 +8,7 @@
 
 #include "../libs/std.h"
 
-typedef struct
+typedef struct _timing_clock
 {
     uchar ucSeconds;
     uchar ucMinutes;
@@ -17,9 +17,9 @@ typedef struct
     uchar ucDate;
     uchar ucMonth;
     uchar ucYear;
-} Clock;
+} Timing_Clock;
 
-typedef struct 
+typedef struct _timing_raw_clock
 {
     uchar ucHoursTens;
     uchar ucHoursDigits;
@@ -27,13 +27,13 @@ typedef struct
     uchar ucMinutesDigits;
     uchar ucSecondsTens;
     uchar ucSecondsDigits;    
-} RawClock;
+} Timing_RawClock;
 
 const uchar g_aubyDaysInMonths[12] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 
 
-void Timing_ReadRawClock(RawClock* pRawClock);
-void Timing_ReadClock(Clock* pclock);
+void Timing_ReadRawClock(Timing_RawClock* pRawClock);
+void Timing_ReadClock(Timing_Clock* pclock);
 void Timing_SetTime(uchar ucHours, uchar ucMinutes, uchar ucSeconds);
 void Timing_SetCalendar(uchar ucDay, uchar ucDate, uchar ucMonth, uchar ucYear);
 void Timing_ReadTime(void);
