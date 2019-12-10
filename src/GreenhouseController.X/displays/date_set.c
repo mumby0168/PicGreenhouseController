@@ -125,10 +125,10 @@ void Date_Set_Display(void)
 {
     s_ubyDigitPosition = 0;
     Timing_ReadTime();
-    Clock clock;
+    Timing_Clock clock;
     Timing_ReadClock(&clock);
     uchar* pClock = &clock;
-    memcpy(&s_DateSet, pClock + (sizeof(Clock) - sizeof(DateSet)), sizeof(DateSet));
+    memcpy(&s_DateSet, pClock + (sizeof(Timing_Clock) - sizeof(DateSet)), sizeof(DateSet));
 
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &date_set_display_up_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &date_set_display_down_arrow);

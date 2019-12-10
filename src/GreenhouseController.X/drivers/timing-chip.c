@@ -48,8 +48,8 @@
 #define COMPLETE_OPERATION RST = 0;
 
 //Structures
-static RawClock s_rawClock;
-static Clock s_clock;
+static Timing_RawClock s_rawClock;
+static Timing_Clock s_clock;
 
 //Write Operations
 static void write_date(uchar data);
@@ -79,14 +79,14 @@ static void write_byte(uchar *);
 
 // High Level API
 
-void Timing_ReadRawClock(RawClock *pRawClock)
+void Timing_ReadRawClock(Timing_RawClock *pRawClock)
 {
-    memcpy(pRawClock, &s_rawClock, sizeof(RawClock));
+    memcpy(pRawClock, &s_rawClock, sizeof(Timing_RawClock));
 }
 
-void Timing_ReadClock(Clock *pClock)
+void Timing_ReadClock(Timing_Clock *pClock)
 {
-    memcpy(pClock, &s_clock, sizeof(Clock));
+    memcpy(pClock, &s_clock, sizeof(Timing_Clock));
 }
 
 void Timing_Init()
