@@ -37,14 +37,3 @@ uchar Matrix_GetColumn(uchar col)
 {
     return (Matrix_usKeyState >> (col * 4)) & 0x0F;
 }
-
-bool Matrix_IsButtonPressed(uchar columnState, uchar button)
-{
-    return columnState & (1 << button);
-}
-
-void Matrix_GetColumns(uchar* ptr)
-{
-    for (uchar i = 0; i < 4; i++)
-        ptr[i] = (Matrix_usKeyState >> (i * 4)) & 0x0F;
-}

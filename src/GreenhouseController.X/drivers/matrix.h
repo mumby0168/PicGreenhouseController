@@ -11,10 +11,11 @@
 ushort Matrix_usKeyState;
 
 void Matrix_CheckColumns();
+
 void Matrix_CheckColumnState(uchar col);
+
 void Matrix_Init(void);
+
 uchar Matrix_GetColumn(uchar col);
-bool Matrix_IsButtonPressed(uchar columnState, uchar button);
-void Matrix_GetColumns(uchar* p);
 
 #endif
