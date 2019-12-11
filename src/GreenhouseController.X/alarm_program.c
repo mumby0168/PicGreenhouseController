@@ -55,7 +55,7 @@ void Alarm_Program_Update(void)
     Timing_ReadTime();
     Eeprom_Eeprom eepromSettings;
     Eeprom_GetEeprom(&eepromSettings);
-    Eeprom_AlarmSettings* pSettings = &eepromSettings;
+    uchar* pSettings = &eepromSettings;
     
     Timing_Clock clock;
     Timing_ReadClock(&clock);
@@ -68,16 +68,16 @@ void Alarm_Program_Update(void)
     else
     {
         s_CurrentProgram = ALARM_PROGRAM_NIGHT;
-        pSettings += 1;
+        pSettings += sizeof(Eeprom_AlarmSettings);
     }
     
     Thermometer_ScratchPad sp;
     Thermometer_ReadScratchPad(&sp, 2);
     Thermometer_BcdTemperature tempBcd;
     Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
-    int sCurrentTemp = Thermometer_ConvertTempratureToShort(&tempBcd);
-    int sHighTemp = Thermometer_ConvertTempratureToShort(pSettings);
-    int sLowTemp = Thermometer_ConvertTempratureToShort(((uchar*)pSettings) + 5);
+    short sCurrentTemp = Thermometer_ConvertTempratureToShort(&tempBcd);
+    short sHighTemp = Thermometer_ConvertTempratureToShort((uchar*)pSettings);
+    short sLowTemp = Thermometer_ConvertTempratureToShort(((uchar*)pSettings) + EEPROM_WARM_COLD_ALARM_BYTES);
     
     if (sCurrentTemp > sHighTemp)
     {
@@ -86,7 +86,7 @@ void Alarm_Program_Update(void)
         RB6 = 0;
         RB7 = 1;
         
-        if (s_sPrevTemp - sCurrentTemp < 0 && !s_bIsSilenced) //if the vector from current to prev is negative or the same then it is not cooling so sound alarm
+        if (s_sPrevTemp - sCurrentTemp <= 0 && !s_bIsSilenced) //if the vector from current to prev is negative or the same then it is not cooling so sound alarm
         {
             PORTE = 0b001;
             s_bIsAlarming = true;
@@ -104,7 +104,7 @@ void Alarm_Program_Update(void)
         RB6 = 1;
         RB7 = 0;
         
-        if (s_sPrevTemp - sCurrentTemp > 0 && !s_bIsSilenced) //if the vector from current to prev is positive or the same then it is not warming so sound alarm
+        if (s_sPrevTemp - sCurrentTemp >= 0 && !s_bIsSilenced) //if the vector from current to prev is positive or the same then it is not warming so sound alarm
         {
             PORTE = 0b001;
             s_bIsAlarming = true;
