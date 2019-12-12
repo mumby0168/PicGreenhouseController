@@ -15,22 +15,22 @@ static uchar s_ubyDdramPos = 0;
 
 #define lcd_delay() for (int i=0; i<50; i++);
 
-#define lcd_write_command(data)\
+#define lcd_write_command(cmd)\
     USE_INSTRUCTION_REG;\
     TRISD = 0x00;\
     Reset = 0;\
     ReadWrite = 0;\
-    PORTD = data; \
+    PORTD = cmd; \
     Enable = 0; \
     lcd_delay();\
     Enable = 1;\
     PORTD = 0;\
     
-#define lcd_write_character(c)\
+#define lcd_write_character(data)\
     USE_DATA_REG;\
     Reset = 1;\
     ReadWrite = 0;\
-    PORTD = c;\
+    PORTD = data;\
     Enable = 0;\
     lcd_delay();\
     Enable = 1;\
@@ -43,21 +43,26 @@ inline static void lcd_set_ddram_address(const uchar pos)
 
 static uchar lcd_read_ddram_value(void)
 {
+    //states PORTD is input
     TRISD = 0xFF;
     
+    //states checking the data registers
     USE_DATA_REG
             
+    // Sets pins according to timing diagram
     Reset = 1;
     ReadWrite = 1;
     Enable = 1;
     
+    // Reads PORTD
     char data = PORTD;
     
+    // Delays & pins as per timing diagram
     Enable = 0;
-    lcd_delay();
-    
+    lcd_delay();    
     Enable = 1;
     
+    //returns the data read
     return data;
 }
 
