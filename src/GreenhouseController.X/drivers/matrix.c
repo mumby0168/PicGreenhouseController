@@ -14,13 +14,18 @@ void Matrix_Init()
 
 void Matrix_CheckColumnState(uchar col)
 {        
-    if (col > 3)
+    // checks to see if the input is valid
+    if (col > 3) 
         col = 3;
     
-    PORTC = 0x00;
-    SetBitHigh(&PORTC, 3 - col);
-    ushort nibble = GetHighNibble(&PORTC);          
-    Matrix_usKeyState |= (nibble << (col * 4));
+    // clears port C so data is new
+    PORTC = 0x00; 
+    // drives the columns pin high
+    SetBitHigh(&PORTC, 3 - col); 
+    // gets the state data from PORTC  
+    ushort nibble = GetHighNibble(&PORTC);         
+    // shifts the state into the positon for the column in the data structure.
+    Matrix_usKeyState |= (nibble << (col * 4)); 
 }
 
 void Matrix_CheckColumns()
@@ -36,15 +41,4 @@ void Matrix_CheckColumns()
 uchar Matrix_GetColumn(uchar col)
 {
     return (Matrix_usKeyState >> (col * 4)) & 0x0F;
-}
-
-bool Matrix_IsButtonPressed(uchar columnState, uchar button)
-{
-    return columnState & (1 << button);
-}
-
-void Matrix_GetColumns(uchar* ptr)
-{
-    for (uchar i = 0; i < 4; i++)
-        ptr[i] = (Matrix_usKeyState >> (i * 4)) & 0x0F;
 }
