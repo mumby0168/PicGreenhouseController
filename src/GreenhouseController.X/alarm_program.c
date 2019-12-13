@@ -38,23 +38,28 @@ bool Alarm_Program_IsCooling(void)
 
 void Alarm_Program_Init(void)
 {
+    //set up port and tris reg for buzzer
     TRISE = 0b000;
     PORTE = 0b000;
+    //Set up LEDs for heater and a/c
     TRISB6 = 0;
     TRISB7 = 0;
     RB6 = 0;
     RB7 = 0;
     
+    //Register an action listener for the silence alarm action
     Fst_SetAction(FST_ACTION_SILENCE_ALARM, &alarm_program_silence);
     
+    //Call an update to initialise the cooling/heating 
     Alarm_Program_Update();
 }
 
 void Alarm_Program_Update(void)
-{    
+{   
     Timing_ReadTime();
     Eeprom_Eeprom eepromSettings;
     Eeprom_GetEeprom(&eepromSettings);
+    //Take a reference to the eeprom settings so we can skip parts
     uchar* pSettings = &eepromSettings;
     
     Timing_Clock clock;
@@ -68,24 +73,20 @@ void Alarm_Program_Update(void)
     else
     {
         s_CurrentProgram = ALARM_PROGRAM_NIGHT;
+        //Using night time settings so skip over the alarm settings
         pSettings += sizeof(Eeprom_AlarmSettings);
     }
     
     Thermometer_ScratchPad sp;
     Thermometer_ReadScratchPad(&sp, 2);
+    
     Thermometer_BcdTemperature tempBcd;
     Thermometer_ConvertTempratureToBcd(sp.ubyTempMsb, sp.ubyTempLsb, &tempBcd);
+    
     short sCurrentTemp = Thermometer_ConvertTempratureToShort(&tempBcd);
     short sHighTemp = Thermometer_ConvertTempratureToShort((uchar*)pSettings);
     short sLowTemp = Thermometer_ConvertTempratureToShort(((uchar*)pSettings) + EEPROM_WARM_COLD_ALARM_BYTES);
-    
-//    Lcd_SetCursorPosition(1, 3);
-//    Lcd_WriteCharacter((*(uchar*)pSettings) + 48);
-//    Lcd_WriteCharacter((*(uchar*)pSettings + 1) + 48);
-//    Lcd_WriteCharacter((*(uchar*)pSettings + 2) + 48);
-//    Lcd_WriteCharacter((*(uchar*)pSettings + 3) + 48);
-//    Lcd_WriteCharacter((*(uchar*)pSettings + 4) + 48);
-    
+
     if (sCurrentTemp > sHighTemp)
     {
         s_bIsCooling = true;

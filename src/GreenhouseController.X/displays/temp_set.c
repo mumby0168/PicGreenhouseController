@@ -15,6 +15,8 @@ static s_ubySelectedDigit = 0;
 static uchar s_aubyDigitLimits[5] = { 1, 1, 9, 9, 9 };
 static Eeprom_Eeprom s_eeprom;
 
+//takes a pointer to the part of the settings to display
+//dereference it and then increment it in each part to get the next part of the BCD
 static void temp_set_display_render_temp(uchar* pSettingData)
 {
     Lcd_SetCursorPosition(5, 2);
@@ -79,6 +81,7 @@ static void temp_set_display_draw_carrot(void)
 
 void Temp_Set_Display_Init(void)
 {
+    //Register the action handlers for loading the settings
     Fst_SetAction(FST_ACTION_COLD_SETTINGS, &temp_set_display_select_cold_settings);
     Fst_SetAction(FST_ACTION_HOT_SETTINGS, &temp_set_display_select_hot_settings);
     Fst_SetAction(FST_ACTION_LOAD_DAY_SETTINGS, &temp_set_display_load_day_settings);
@@ -88,45 +91,52 @@ void Temp_Set_Display_Init(void)
 static void temp_set_display_up_arrow()
 {
     Lcd_SetCursorPosition(1, 1);
-    uchar* pSettingData = &s_eeprom;
+    uchar* pSettingData = &s_eeprom; //take a pointer to the alarm settings
     
-    if (!s_bIsDay)
+    if (!s_bIsDay) //if it is day sit over the daytime settings
         pSettingData += sizeof(Eeprom_AlarmSettings);
     
-    if (!s_bIsHot)
+    if (!s_bIsHot) //if it is the cold setting skip over the warm settings
         pSettingData += EEPROM_WARM_COLD_ALARM_BYTES;   
     
+    //increment the pointer by number of the current digit the user is editing
     pSettingData += s_ubySelectedDigit;
     
+    //increment the value which the pointer is stored in, if it is greater then the limit set it to zero
     if (++(*pSettingData) > s_aubyDigitLimits[s_ubySelectedDigit])
         *pSettingData = 0;
     
+    //decrement the pointer so it is pointing back to the first digit
     pSettingData -= s_ubySelectedDigit;
 
+    //redraw the tempreature
     temp_set_display_render_temp(pSettingData);
 }
     
 static void temp_set_display_down_arrow()
 {
     Lcd_SetCursorPosition(1, 1);
-    uchar* pSettingData = &s_eeprom;
+    uchar* pSettingData = &s_eeprom; //take a pointer to the alarm settings
     
-    if (!s_bIsDay)
+    if (!s_bIsDay) //if it is day sit over the daytime settings
         pSettingData += sizeof(Eeprom_AlarmSettings);
     
-    if (!s_bIsHot)
+    if (!s_bIsHot) //if it is the cold setting skip over the warm settings
         pSettingData += EEPROM_WARM_COLD_ALARM_BYTES;   
     
+    //increment the pointer by number of the current digit the user is edit
     pSettingData += s_ubySelectedDigit;
     
+    //if the current value is zero go back to the limit otherwise decrement the value thats pointed to
     if (*pSettingData == 0)
         *pSettingData = s_aubyDigitLimits[s_ubySelectedDigit];
     else
         (*pSettingData)--;
     
-    
+    //decrement the pointer so it is pointing back to the first digit
     pSettingData -= s_ubySelectedDigit;
     
+    //redraw the tempreature
     temp_set_display_render_temp(pSettingData);
 }
 
@@ -174,6 +184,7 @@ void Temp_Set_Display(void)
     Eeprom_Load();
     s_ubySelectedDigit = 0;
     
+    //Register the actions delegates to the action each time as other displays will overwrite these
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &temp_set_display_up_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &temp_set_display_down_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_LEFT_BUTTON, &temp_set_display_left_arrow);
@@ -181,7 +192,7 @@ void Temp_Set_Display(void)
     Fst_SetAction(FST_ACTION_SAVE, &temp_set_display_save);
     
     Eeprom_GetEeprom(&s_eeprom);
-    uchar* pSettingData = &s_eeprom;
+    uchar* pSettingData = &s_eeprom; //take a pointer to the settings
     
     Lcd_SetCursorPosition(1,1);
     if(s_bIsDay)
@@ -191,7 +202,7 @@ void Temp_Set_Display(void)
     else
     {
         Lcd_WriteString(g_Night);
-        pSettingData += sizeof(Eeprom_AlarmSettings);
+        pSettingData += sizeof(Eeprom_AlarmSettings);//skip over the day time settings
     }
 
     Lcd_SetCursorPosition(12, 1);
@@ -202,12 +213,12 @@ void Temp_Set_Display(void)
     else
     {
         Lcd_WriteString(g_Cold);
-        pSettingData += EEPROM_WARM_COLD_ALARM_BYTES;
+        pSettingData += EEPROM_WARM_COLD_ALARM_BYTES; //skip over the warm settings
     }
 
     Lcd_SetCursorPosition(5, 2);
     
-    temp_set_display_render_temp(pSettingData);
+    temp_set_display_render_temp(pSettingData); //render the temperature that is been pointed to...
     
     Display_Std_DrawBack();
     Display_Std_DrawSave();

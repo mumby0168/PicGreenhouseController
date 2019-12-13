@@ -19,6 +19,7 @@ bool Eeprom_Save(void)
     EEADR = 0;
     EECON1bits.WRERR = 0;    
     uchar* pEepromSettings = &s_Eeprom;
+    //Iterate the eeprom struct from the start to the end
     for (uchar* p = &s_Eeprom; p < pEepromSettings + sizeof(Eeprom_Eeprom); p++)
     {
         PIR2bits.EEIF = 0; //clear the eeprom finished interrupt flag.
@@ -26,15 +27,17 @@ bool Eeprom_Save(void)
         //wait for previous write to finish
         while (EECON1bits.WR);
         
-        EEDATA = *p;
+        EEDATA = *p; //dereference the iterating pointer and store it in the data register to write to eeprom
         
         //start write sequence
         EECON2 = 0x55;
         EECON2 = 0xAA;
         EECON1bits.WR = EEPREOM_START_WRITE;
         
+        //Wait for the write to finish
         while (PIR2bits.EEIF == 0);
         
+        //Check for an error
         if (EECON1bits.WRERR == 1)
             return false;
         
@@ -54,16 +57,19 @@ void Eeprom_Load(void)
     
     EEADR = 0;
     uchar* pEeprom = &s_Eeprom;
+    //Iterate the eeprom struct from start to the end
     for (uchar* p = &s_Eeprom; p < pEeprom + sizeof(Eeprom_Eeprom); p++)
     {
+        //clear the data reg so its not got anything in from prev iteration
         EEDATA = 0x00;
         
         EECON1bits.RD = EEPREOM_START_READ;
-        *p = EEDATA;
+        *p = EEDATA; //store the eeprom register into the derefernced iterator
 
         EEADR++;
     }
     
+    //The eeprom was blanked by the programmer; zero the bytes used and load default settings
     if (s_Eeprom.ubyHasBeenBlanked == 0xFF)
     {
         for (uchar* p = &s_Eeprom; p < pEeprom + sizeof(Eeprom_Eeprom); p++)
@@ -93,14 +99,10 @@ void Eeprom_LoadDefaultSettings(void)
 
 void Eeprom_GetEeprom(Eeprom_Eeprom* const pEepromCopy)
 {
-    uchar* pEeprom = &s_Eeprom;
-    for (uchar i = 0; i < sizeof(Eeprom_Eeprom); i++)
-        *((uchar*)pEepromCopy + i) = *(pEeprom + i);
+    memcpy(pEepromCopy, &s_Eeprom, sizeof(Eeprom_Eeprom));
 }
 
 void Eeprom_SetEeprom(const Eeprom_Eeprom* const pEepromCopy)
 {
-    uchar* pEeprom = &s_Eeprom;
-    for (uchar i = 0; i < sizeof(Eeprom_Eeprom); i++)
-        *(pEeprom + i) = *((uchar*)pEepromCopy + i);
+     memcpy(&s_Eeprom, pEepromCopy, sizeof(Eeprom_Eeprom));
 }

@@ -105,6 +105,7 @@ static uchar thermometer_reset(void)
 void Thermometer_Init()
 {
     Thermometer_bProcessTemperatureComplete = false;
+    //set up timer two interrupt
     PIR1bits.TMR2IF = 0; //clear the flag
     PIE1bits.TMR2IE = 1; //enable timer 2  
     /*
@@ -160,7 +161,8 @@ uchar Themometer_WriteScratchPad(const Thermometer_UserConfig userConfig)
     
     thermometer_write_byte(0x4E);
     
-    for (uchar* pUcEntry = &userConfig; pUcEntry < pUcEntry + sizeof(Thermometer_UserConfig); pUcEntry++)
+    //iterate the user config struct and write out the bytes in it by dereferncing the iterator and passing it to thermometer_write_byte
+    for (uchar* pUcEntry = &userConfig; pUcEntry < &userConfig + sizeof(Thermometer_UserConfig); pUcEntry++)
         thermometer_write_byte(*pUcEntry);
     
     return byStatus;
@@ -178,6 +180,7 @@ uchar Thermometer_ReadScratchPad(Thermometer_ScratchPad* pScratchPad, uchar byBy
     if (byBytesToRead > sizeof(Thermometer_ScratchPad))
         byBytesToRead = sizeof(Thermometer_ScratchPad);
     
+    //iterate the scratch struct store the read bytes in it by dereferncing the iterator and assigning the value from read bye
     for (uchar* pSpEntry = pScratchPad; pSpEntry < pScratchPad + byBytesToRead; pSpEntry++)
     {
         *pSpEntry = thermometer_read_byte();
