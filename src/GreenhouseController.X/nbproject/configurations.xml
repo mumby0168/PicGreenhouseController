@@ -18,7 +18,6 @@
         <itemPath>drivers/eeprom.h</itemPath>
         <itemPath>drivers/lcd.h</itemPath>
         <itemPath>drivers/matrix.h</itemPath>
-        <itemPath>drivers/therm.h</itemPath>
         <itemPath>drivers/timing-chip.h</itemPath>
         <itemPath>fst.h</itemPath>
         <itemPath>drivers/thermometer.h</itemPath>
@@ -51,7 +50,6 @@
         <itemPath>drivers/eeprom.c</itemPath>
         <itemPath>drivers/lcd.c</itemPath>
         <itemPath>drivers/matrix.c</itemPath>
-        <itemPath>drivers/therm.c</itemPath>
         <itemPath>drivers/timing-chip.c</itemPath>
         <itemPath>fst.c</itemPath>
         <itemPath>drivers/thermometer.c</itemPath>

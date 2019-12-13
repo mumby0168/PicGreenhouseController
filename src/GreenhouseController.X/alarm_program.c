@@ -10,7 +10,7 @@
 
 static Alarm_Program_Programs s_CurrentProgram = ALARM_PROGRAM_DAY;
 static const unsigned short s_usDayProgramStartTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(6, 30);
-static const unsigned short s_usNightProgramStartTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(18, 30);
+static const unsigned short s_usNightProgramStartTimeInMins = CONVERT_HOURS_AND_MINS_TO_MINS(19, 30);
 static bool s_bIsHeating = false;
 static bool s_bIsCooling = false;
 static short s_sPrevTemp = 0;
@@ -74,10 +74,17 @@ void Alarm_Program_Update(void)
     Thermometer_ScratchPad sp;
     Thermometer_ReadScratchPad(&sp, 2);
     Thermometer_BcdTemperature tempBcd;
-    Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
+    Thermometer_ConvertTempratureToBcd(sp.ubyTempMsb, sp.ubyTempLsb, &tempBcd);
     short sCurrentTemp = Thermometer_ConvertTempratureToShort(&tempBcd);
     short sHighTemp = Thermometer_ConvertTempratureToShort((uchar*)pSettings);
     short sLowTemp = Thermometer_ConvertTempratureToShort(((uchar*)pSettings) + EEPROM_WARM_COLD_ALARM_BYTES);
+    
+//    Lcd_SetCursorPosition(1, 3);
+//    Lcd_WriteCharacter((*(uchar*)pSettings) + 48);
+//    Lcd_WriteCharacter((*(uchar*)pSettings + 1) + 48);
+//    Lcd_WriteCharacter((*(uchar*)pSettings + 2) + 48);
+//    Lcd_WriteCharacter((*(uchar*)pSettings + 3) + 48);
+//    Lcd_WriteCharacter((*(uchar*)pSettings + 4) + 48);
     
     if (sCurrentTemp > sHighTemp)
     {

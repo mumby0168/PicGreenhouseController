@@ -68,7 +68,7 @@ static void main_display_render_time_and_temp()
         Lcd_WriteString("                        ");
     }
     Thermometer_BcdTemperature tempBcd;
-    Thermometer_ConvertTempratureToBcd(sp.byTempMsb, sp.byTempLsb, &tempBcd);
+    Thermometer_ConvertTempratureToBcd(sp.ubyTempMsb, sp.ubyTempLsb, &tempBcd);
     
     Lcd_SetCursorPosition(5, 2);
     if (tempBcd.bIsNegative)

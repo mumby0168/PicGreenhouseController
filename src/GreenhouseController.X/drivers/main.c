@@ -26,9 +26,6 @@
 #pragma config LVP = OFF // Low-Voltage (Single-Supply) In-Circuit Serial Programming Enable bit (RB3 is digital I/O, HV on MCLR must be used for programming)
 //end config
 
-#define DEMO
-
-#ifdef DEMO
 void main(void) 
 {   
     Lcd_Init(); //this is a pre-requisite to the fst. As is the button matrix however only the fst will use that so we leave it for the fst to handle.
@@ -57,5 +54,3 @@ void main(void)
     
     return;
 }
-
-#endif
