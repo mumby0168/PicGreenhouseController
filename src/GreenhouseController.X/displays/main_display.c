@@ -55,6 +55,7 @@ static void main_display_render_time_and_temp()
     Lcd_WriteNumber(clock.ucYear);
     
     Thermometer_ScratchPad sp;
+    //checks see if the therm is available.
     if (Thermometer_ReadScratchPad(&sp, 2))
     {
         Lcd_SetCursorPosition(1, 2);

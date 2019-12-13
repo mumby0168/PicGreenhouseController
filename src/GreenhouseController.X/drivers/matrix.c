@@ -30,14 +30,19 @@ void Matrix_CheckColumnState(uchar col)
 
 void Matrix_CheckColumns()
 {
+    //loops over all columns checking them
     for (uchar i = 0; i < 4; i++)
     {
+        // clear portC
         PORTC = 0x00;
+        //sets the correct bit high for the column to check.
         SetBitHigh(&PORTC, 3 - i);
+        //pushes the state for the column into the right portion of bits.
         Matrix_usKeyState |= GetHighNibble(&PORTC) << (i * 4);
     }
 }
 
+// Get the portion of bits for the column passsed.
 uchar Matrix_GetColumn(uchar col)
 {
     return (Matrix_usKeyState >> (col * 4)) & 0x0F;

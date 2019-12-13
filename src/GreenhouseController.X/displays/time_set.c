@@ -39,6 +39,7 @@ static void time_set_display_render_time(void)
 
 static void time_set_update_time_limits()
 {
+    //checks limits based on tens value to limit digits e.g. 23 valud 27 not.
     if (s_TimeSet.ucHoursTens == 2)
     {
         s_aubyTimeLimits[1] = 3;
@@ -60,6 +61,7 @@ static void time_set_display_up_arrow(void)
     uchar* pDigit = &s_TimeSet;
     pDigit += s_ubyDigitPosition;
     
+    //increments the value of the pointer and checks limit reset if over.
     if (++(*pDigit) > s_aubyTimeLimits[s_ubyDigitPosition])
     {
         *pDigit = 0;
@@ -74,6 +76,7 @@ static void time_set_display_down_arrow(void)
     uchar* pDigit = &s_TimeSet;
     pDigit += s_ubyDigitPosition;
     
+    //checks if is zero resets high value if is.
     if ((*pDigit) == 0)
     {
         *pDigit = s_aubyTimeLimits[s_ubyDigitPosition];
@@ -134,6 +137,7 @@ void Time_Set_Display(void)
     Timing_ReadRawClock(&rawClock);
     memcpy(&s_TimeSet, &rawClock, sizeof(Timing_RawClock));
 
+    //setups handlers for action for this screen.
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &time_set_display_up_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &time_set_display_down_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_LEFT_BUTTON, &time_set_display_left_arrow);

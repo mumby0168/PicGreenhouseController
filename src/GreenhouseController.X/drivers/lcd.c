@@ -78,9 +78,11 @@ void Lcd_Init(void)
     TRISA = 0x00;
     TRISD = 0x00;
     
+    //Select parallel operation mode.
     LCD_BUS_MODE = LCD_BUS_MODE_PARALLEL;
     
     lcd_write_command(0b00110000); //select the basic functionality
+    //turns on display no cursor or blink.
     Lcd_SetDisplayMode(true, false, false);
     Lcd_ClearDisplay();
 }
@@ -92,21 +94,25 @@ inline void Lcd_SetDisplayMode(const bool bLcdOn, const bool bCursorOn, const bo
 
 void Lcd_WriteNumber(char num)
 {
+    //writes the character if over 100 as not supported.
     if(num > 100)
     {
         Lcd_WriteCharacter(126);
         return;
     }
     
+    //calculates the ascii value of the number passed uses 0 as placeholder if num < 10.
     Lcd_WriteCharacter((num / 10) + 48);
     Lcd_WriteCharacter((num % 10) + 48);
 }
 
 void Lcd_SetCursorPosition(uchar ubyPos, uchar ubyLine)
 {
+    //assigns to global internal variables.
     s_ubyLinePos = ubyPos;
     s_ubyLineNumber = ubyLine;
     
+    //manages overflows on the lcd
     if (ubyPos < 1)
         ubyPos = 1;
     
@@ -122,6 +128,7 @@ void Lcd_SetCursorPosition(uchar ubyPos, uchar ubyLine)
     ubyPos -= 1;
     uchar ubyDdramAddress = ubyPos / 2;
     
+    //calculates the position on ddram for each line.
     switch (ubyLine)
     {
         case 1:
@@ -159,6 +166,7 @@ void Lcd_RecallLastPosition()
 
 void Lcd_WriteCharacter(const char c)
 {    
+    //writes on the new line if needed.
     if (s_ubyLinePos % 16 == 0 && s_ubyDdramPos == 1)
     {
         lcd_write_character(c);
@@ -179,12 +187,14 @@ void Lcd_WriteCharacter(const char c)
 
 void Lcd_WriteString(const char* pStr)
 {
+    //writes a string until null char reached.
     for (const char* p = pStr; *p != '\0'; p++)
         Lcd_WriteCharacter(*p);
 }
 
 inline void Lcd_ClearDisplay()
 {
+    //clears the display 
     lcd_write_command(0x01);
     s_ubyLineNumber = 1;
     s_ubyLinePos = 1;

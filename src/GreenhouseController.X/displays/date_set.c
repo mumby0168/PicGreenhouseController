@@ -42,13 +42,16 @@ static void date_set_display_render_date()
 
 static void date_set_update_limits()
 {
+    //modifies limits based on leap year or not.
     s_aubyDateLimits[0] = g_aubyDaysInMonths[s_DateSet.month - 1];
     if (Timing_IsLeapYear(s_DateSet.year) && s_DateSet.month == 2)
         s_aubyDateLimits[0] += 1;
     
+    //resets if limit reached
     if (s_DateSet.date > s_aubyDateLimits[0])
         s_DateSet.date = s_aubyDateLimits[0];
     
+    //re-renders
     date_set_display_render_date();
 }
 
@@ -57,6 +60,7 @@ static void date_set_display_up_arrow(void)
     uchar* pDigit = &s_DateSet;
     pDigit += s_ubyDigitPosition;
     
+    //increments the value of the pntr depending on number modifying.
     if (++(*pDigit) > s_aubyDateLimits[s_ubyDigitPosition])
     {
         *pDigit = 1;
@@ -71,6 +75,7 @@ static void date_set_display_down_arrow(void)
     uchar* pDigit = &s_DateSet;
     pDigit += s_ubyDigitPosition;
     
+    //resets value to high limit if lower reached.
     if ((*pDigit) == 1)
     {
         *pDigit = s_aubyDateLimits[s_ubyDigitPosition];
@@ -130,6 +135,7 @@ void Date_Set_Display(void)
     uchar* pClock = &clock;
     memcpy(&s_DateSet, pClock + (sizeof(Timing_Clock) - sizeof(DateSet)), sizeof(DateSet));
 
+    //sets up action hanlders for this display.
     Fst_SetAction(FST_ACTION_HANDLE_UP_BUTTON, &date_set_display_up_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_DOWN_BUTTON, &date_set_display_down_arrow);
     Fst_SetAction(FST_ACTION_HANDLE_LEFT_BUTTON, &date_set_display_left_arrow);
